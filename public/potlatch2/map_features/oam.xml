@@ -1,0 +1,40 @@
+<featureGroup>
+  <feature name="Navaid">
+    <category>navaid</category>
+    <icon image="features/manmade_tower.png"/>
+    <point/>
+    <tag k="navaid" v="yes"/>
+    <inputSet ref="namesAndRef" />
+    <inputSet ref="navaid" />
+  </feature>
+  
+  <feature name="Airspace">
+    <category>airspace</category>
+    <icon image="features/manmade_silo.png"/>
+    <area/>
+    <tag k="airspace" v="yes"/>
+    <inputSet ref="namesAndRef" />
+    <input type="choice" key="airspace:class" name="Airspace class" presence="always" priority="highest">
+      <choice value="a" text="A"/>
+      <choice value="b" text="B"/>
+      <choice value="c" text="C"/>
+      <choice value="d" text="D"/>
+      <choice value="e" text="E"/>
+      <choice value="f" text="F"/>
+      <choice value="g" text="G"/>
+    </input>
+    <input type="freetext" key="airspace:type" name="Airspace type" presence="always" description="The type of the airspace (TMA, CTR ...)" priority="highest" />
+    <inputSet ref="airportCodes" />
+    <inputSet ref="heightBounds"/>
+  </feature>
+
+  <feature name="Aerodrome">
+    <category>aerodrome</category>
+    <icon image="features/manmade_tower.png"/>
+    <point/>
+    <inputSet ref="namesAndRef"/>
+    <inputSet ref="airportCodes"/>
+    <inputSet ref="height"/>
+  </feature>
+</featureGroup>  
+

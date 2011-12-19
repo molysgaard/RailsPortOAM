@@ -1,0 +1,3 @@
+PassengerEnabled on
+PassengerAppRoot /srv/http/rails
+RackBaseURI /rails/public
