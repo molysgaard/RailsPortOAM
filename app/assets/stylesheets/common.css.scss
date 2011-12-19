@@ -359,6 +359,41 @@ hr {
   font-size: smaller;
 }
 
+.olControlPanel div { 
+  float: left;
+  display:block;
+  width:  24px;
+  height: 24px;
+  margin: 5px;
+  background-color:white;
+}
+
+.olControlPanel .olControlDrawFeatureItemActive { 
+  background-image: image-url('add_point_on.png');
+}
+.olControlPanel .olControlDrawFeatureItemInactive { 
+  background-image: image-url('add_point_off.png');
+}
+.olControlPanel .olControlDragPanItemActive { 
+  background-image: image-url('pan_on.png');
+}
+.olControlPanel .olControlDragPanItemInactive { 
+  background-image: image-url('pan_off.png');
+}
+.olControlPanel .olControlModifyFeatureItemActive { 
+  background-image: image-url('draw_line_on.png');
+}
+.olControlPanel .olControlModifyFeatureItemInactive { 
+  background-image: image-url('draw_line_off.png');
+}
+.olControlPanel .olControlDeleteFeatureItemActive { 
+  background-image: image-url('remove_point_on.png');
+}
+.olControlPanel .olControlDeleteFeatureItemInactive { 
+  background-image: image-url('remove_point_off.png');
+}
+
+
 /* Rules for edit menu */
 
 .menu {

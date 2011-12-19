@@ -5,89 +5,81 @@ var vectors;
 var popup;
 
 function createMap(divName, options) {
-   options = options || {};
+    OpenLayers.ProxyHost = "/cgi-bin/proxy.cgi?url=";
+    map = new OpenLayers.Map('map');
+    var topo2 = new OpenLayers.Layer.WMS(
+		"Topografisk norgeskart2","http://opencache.statkart.no/gatekeeper/gk/gk.open?",
+		{layers: 'kartdata2', format: 'image/jpeg',
+		projection: "EPSG:4326"});
+    map.addLayer(topo2);
 
-   map = new OpenLayers.Map(divName, {
-      controls: options.controls || [
-         new OpenLayers.Control.ArgParser(),
-         new OpenLayers.Control.Attribution(),
-         new OpenLayers.Control.LayerSwitcher(),
-         new OpenLayers.Control.Navigation(),
-         new OpenLayers.Control.PanZoom(),
-         new OpenLayers.Control.PanZoomBar(),
-         new OpenLayers.Control.ScaleLine({geodesic: true})
-      ],
-      units: "m",
-      maxResolution: 156543.0339,
-      numZoomLevels: 20,
-      displayProjection: new OpenLayers.Projection("EPSG:4326")
-   });
+    var wms = new OpenLayers.Layer.WMS( "OpenLayers WMS", 
+	"http://vmap0.tiles.osgeo.org/wms/vmap0?", {layers: 'basic'}); 
+    map.addLayer(wms);
 
-   var mapnik = new OpenLayers.Layer.OSM.Mapnik(i18n("javascripts.map.base.mapnik"), {
-      attribution: "",
-      keyid: "mapnik",
-      displayOutsideMaxExtent: true,
-      wrapDateLine: true,
-      layerCode: "M"
-   });
-   map.addLayer(mapnik);
+    //START OF THE DRAWING LAYER
+    vectors = new OpenLayers.Layer.Vector("Drawing Layer");
+    map.addLayer(vectors);
 
-   var osmarender = new OpenLayers.Layer.OSM.Osmarender(i18n("javascripts.map.base.osmarender"), {
-      attribution: "",
-      keyid: "osmarender",
-      displayOutsideMaxExtent: true,
-      wrapDateLine: true,
-      layerCode: "O"
-   });
-   map.addLayer(osmarender);
+    var move = new OpenLayers.Control.DragPan();
+    var draw = new OpenLayers.Control.DrawFeature(vectors,OpenLayers.Handler.Path);
+    var modify = new OpenLayers.Control.ModifyFeature(vectors);
+    var remove = new DeleteFeature(vectors);
 
-   var cyclemap = new OpenLayers.Layer.OSM.CycleMap(i18n("javascripts.map.base.cycle_map"), {
-      attribution: "Tiles courtesy of <a href='http://www.opencyclemap.org/' target='_blank'>Andy Allan</a>",
-      keyid: "cyclemap",
-      displayOutsideMaxExtent: true,
-      wrapDateLine: true,
-      layerCode: "C"
-   });
-   map.addLayer(cyclemap);
+    var panel = new OpenLayers.Control.Panel({defaultControl: move});
+    panel.addControls([move, draw, modify, remove]);
+    map.addControl(panel);
 
-   var transportmap = new OpenLayers.Layer.OSM.TransportMap(i18n("javascripts.map.base.transport_map"), {
-      attribution: "Tiles courtesy of <a href='http://www.opencyclemap.org/' target='_blank'>Andy Allan</a>",
-      keyid: "transportmap",
-      displayOutsideMaxExtent: true,
-      wrapDateLine: true,
-      layerCode: "T"
-   });
-   map.addLayer(transportmap);
+    //END OF THE DRAWING LAYER
+    //START OF WFS OAM DATA LAYER
+    wfs = new OpenLayers.Layer.Vector("Geoserver WFS", {
+        strategies: [new OpenLayers.Strategy.BBOX()],
+        protocol: new OpenLayers.Protocol.WFS({
+            url: "http://openaviationmap.org:8080/geoserver/wfs",
+            featureType: "planet_osm_line",
+            featureNS: "http://openaviationmap.org",
+            geometryName: "way",
+            srsName: "EPS900913",
+        }),
+        projection: "EPSG:900913",
+        //renderers: renderer,
+    });
+    map.addLayer(wfs);
+    //END OF WFS OAM DATA LAYER
 
-   var mapquest = new OpenLayers.Layer.OSM(i18n("javascripts.map.base.mapquest"), [
-      "http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-      "http://otile2.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-      "http://otile3.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-      "http://otile4.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
-   ], {
-      attribution: "Tiles courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'>",
-      keyid: "mapquest",
-      displayOutsideMaxExtent: true,
-      wrapDateLine: true,
-      numZoomLevels: 19,
-      layerCode: "Q"
-   });
-   map.addLayer(mapquest);
-
-   var numZoomLevels = Math.max(mapnik.numZoomLevels, osmarender.numZoomLevels);
-
-   markers = new OpenLayers.Layer.Markers("Markers", {
-      displayInLayerSwitcher: false,
-      numZoomLevels: numZoomLevels,
-      maxExtent: new OpenLayers.Bounds(-20037508,-20037508,20037508,20037508),
-      maxResolution: 156543,
-      units: "m",
-      projection: "EPSG:900913"
-   });
-   map.addLayer(markers);
-
-   return map;
+    map.addControl(new OpenLayers.Control.LayerSwitcher());
+    map.addControl(new OpenLayers.Control.MousePosition());
+    map.addControl(new OpenLayers.Control.PanZoom());
+    map.addControl(new OpenLayers.Control.PanZoomBar());
+    return map;
 }
+
+//Control for å slette en feature.
+DeleteFeature = OpenLayers.Class(OpenLayers.Control, {
+    initialize: function(layer, options) {
+        OpenLayers.Control.prototype.initialize.apply(this, [options]);
+        this.layer = layer;
+        this.handler = new OpenLayers.Handler.Feature(
+            this, layer, {click: this.clickFeature}
+        );
+    },
+    clickFeature: function(feature) {
+        // if feature doesn't have a fid, destroy it
+        if(feature.fid == undefined) {
+            this.layer.destroyFeatures([feature]);
+        } else {
+            feature.state = OpenLayers.State.DELETE;
+            this.layer.events.triggerEvent("afterfeaturemodified", {feature: feature});
+            feature.renderIntent = "select";
+            this.layer.drawFeature(feature);
+        }
+    },
+    setMap: function(map) {
+        this.handler.setMap(map);
+        OpenLayers.Control.prototype.setMap.apply(this, arguments);
+    },
+    CLASS_NAME: "OpenLayers.Control.DeleteFeature"
+});
 
 function getArrowIcon() {
    var size = new OpenLayers.Size(25, 22);
