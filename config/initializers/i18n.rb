@@ -8,9 +8,6 @@ module I18n
         def init_translations
           old_init_translations
 
-          store_translations(:nb, translations[:no])
-          translations[:no] = translations[:nb]
-
           friendly = translate('en', 'time.formats.friendly')
 
           available_locales.each do |locale|
