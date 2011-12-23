@@ -64,11 +64,11 @@
   </inputSet>
 
   <inputSet id="navaid">
-    <input type="number" key="navaid:dme" name="DME" description="The DME frequency of this navaid (if it exists.)"/>
-    <input type="number" key="navaid:ndb" name="NDB" description="The NDB frequency of this navaid (if it exists.)"/>
-    <input type="number" key="navaid:vor" name="VOR" description="The VOR frequency of this navaid (if it exists.)"/>
-    <input type="number" key="navaid:tacan" name="TACAN" description="The TACAN frequency of this navaid (if it exists.)"/>
-    <input type="number" key="navaid:ils" name="ILS" description="The ILS frequency of this navaid (if it exists.)"/>
+    <input presence="always" category="Freq" type="number" minimum="0" maximum="1000" stepSize="0.025" key="navaid:dme" name="DME" description="The DME frequency of this navaid (if it exists.)"/>
+    <input presence="always" category="Freq" type="number" minimum="0" maximum="1000" stepSize="0.025" key="navaid:ndb" name="NDB" description="The NDB frequency of this navaid (if it exists.)"/>
+    <input presence="always" category="Freq" type="number" minimum="0" maximum="1000" stepSize="0.025" key="navaid:vor" name="VOR" description="The VOR frequency of this navaid (if it exists.)"/>
+    <input presence="always" category="Freq" type="number" minimum="0" maximum="1000" stepSize="0.025" key="navaid:tacan" name="TACAN" description="The TACAN frequency of this navaid (if it exists.)"/>
+    <input presence="always" category="Freq" type="number" minimum="0" maximum="1000" stepSize="0.025" key="navaid:ils" name="ILS" description="The ILS frequency of this navaid (if it exists.)"/>
   </inputSet>
 
 <!-- Features -->

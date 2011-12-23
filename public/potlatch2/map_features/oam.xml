@@ -32,6 +32,7 @@
     <category>aerodrome</category>
     <icon image="features/manmade_tower.png"/>
     <point/>
+    <tag k="aerodrome" v="yes"/>
     <inputSet ref="namesAndRef"/>
     <inputSet ref="airportCodes"/>
     <inputSet ref="height"/>
