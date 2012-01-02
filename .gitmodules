@@ -1,3 +1,9 @@
 [submodule "public/openlayers"]
 	path = public/openlayers
 	url = https://github.com/openlayers/openlayers.git
+[submodule "public/SlickGrid"]
+	path = public/SlickGrid
+	url = git://github.com/mleibman/SlickGrid.git
+[submodule "public/livepipe-ui"]
+	path = public/livepipe-ui
+	url = git://github.com/saucytiger/livepipe-ui.git
