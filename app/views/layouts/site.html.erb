@@ -3,7 +3,7 @@
   <%= render :partial => "layouts/head" %>
   <body>
     <div id="small-title">
-      <%= link_to(image_tag("osm_logo.png", :size => "16x16", :border => 0, :alt => t('layouts.logo.alt_text')), :controller => 'site', :action => 'index') %>
+      <%= link_to(image_tag("openaviationmap.svg", :size => "16x16", :border => 0, :alt => t('layouts.logo.alt_text')), :controller => 'site', :action => 'index') %>
       <h1><%= t 'layouts.project_name.h1' %></h1>
     </div>
     <div id="content" class="<%= params[:controller] %>_<%= params[:action] %>">
@@ -66,7 +66,7 @@
       <div id="logo">
         <center>
           <h1><%= t 'layouts.project_name.h1' %></h1>
-          <%= link_to(image_tag("osm_logo.png", :size => "120x120", :border => 0, :alt => t('layouts.logo.alt_text')), :controller => 'site', :action => 'index') %><br/>
+          <%= link_to(image_tag("openaviationmap.svg", :size => "120x120", :border => 0, :alt => t('layouts.logo.alt_text')), :controller => 'site', :action => 'index') %><br/>
           <h2 class="nowrap"><%= t('layouts.tag_line') %></h2>
         </center>
       </div>
@@ -109,7 +109,7 @@
 
       <div id="left_menu" class="left_menu">
         <ul>
-          <li><%= link_to(t('layouts.help_centre'), t('layouts.help_url'), :title => t('layouts.help_title')) %></li>
+          <!--<li><%= link_to(t('layouts.help_centre'), t('layouts.help_url'), :title => t('layouts.help_title')) %></li>-->
           <li><%= link_to(t('layouts.documentation'), t('layouts.wiki_url'), :title => t('layouts.documentation_title')) %></li>
           <li><%= link_to t('layouts.copyright'), {:controller => 'site', :action => 'copyright'} %></li>
 	  <!--<li><a href="http://blogs.openstreetmap.org/" title="<%= t 'layouts.community_blogs_title' %>"><%= t 'layouts.community_blogs' %></a></li>-->

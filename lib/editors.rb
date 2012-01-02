@@ -1,3 +1,3 @@
 module Editors 
-  ALL_EDITORS = [ "potlatch", "potlatch2", "remote" ]
+  ALL_EDITORS = [ "potlatch2", "remote" ]
 end

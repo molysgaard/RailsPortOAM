@@ -933,7 +933,7 @@ en:
     user_diaries: User Diaries
     user_diaries_tooltip: View user diaries
     edit_with: Edit with %{editor}
-    tag_line: The Free Wiki World Map
+    tag_line: The Free Wiki Aviation Data Map
     intro_1: "OpenAviationMap is a free editable map of aviationdata for the whole world. It is made by people like you."
     intro_2: "OpenAviationMap allows you to view, edit and use aviation data in a collaborative way from anywhere on Earth."
     intro_3: "OpenAviationMap's hosting is kindly supported by %{ucl}, %{ic} and %{bytemark}. Other supporters of the project are listed in the %{partners}."
@@ -944,14 +944,14 @@ en:
     intro_3_partners_url: "http://wiki.openaviationmap.org/wiki/Partners"
     osm_offline: "The OpenAviationMap database is currently offline while essential database maintenance work is carried out."
     osm_read_only: "The OpenAviationMap database is currently in read-only mode while essential database maintenance work is carried out."
-    donate: "Support OpenAviationMap by %{link} to the Hardware Upgrade Fund."
-    donate_link_text: donating
-    help: Help
-    help_centre: Help Centre
-    help_url: http://help.openstreetmap.org/
-    help_title: Help site for the project
+    #donate: "Support OpenAviationMap by %{link} to the Hardware Upgrade Fund."
+    #donate_link_text: donating
+    #help: Help
+    #help_centre: Help Centre
+    #help_url: http://help.openstreetmap.org/
+    #help_title: Help site for the project
     wiki: Wiki
-    wiki_url: http://wiki.openstreetmap.org/
+    wiki_url: http://wiki.openaviationmap.org/wiki/
     wiki_title: Wiki site for the project
     documentation: Documentation
     documentation_title: Documentation for the project
@@ -964,9 +964,9 @@ en:
     license:
       alt: CC by-sa 2.0
       title: OpenAviationMap data is licensed under the Creative Commons Attribution-Share Alike 2.0 Generic License
-    make_a_donation:
-      title: Support OpenAviationMap with a monetary donation
-      text: Make a Donation
+    #make_a_donation:
+    #  title: Support OpenAviationMap with a monetary donation
+    #  text: Make a Donation
 
   license_page:
     foreign:
