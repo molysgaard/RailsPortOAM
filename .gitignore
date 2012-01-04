@@ -2,3 +2,5 @@ log
 public/assets
 tmp
 .DS_Store
+.htaccess
+public/openlayers/OpenLayers.js

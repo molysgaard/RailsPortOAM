@@ -1,28 +1,17 @@
 var epsg4326 = new OpenLayers.Projection("EPSG:4326");
 var map;
 var markers;
-var vectors;
 var wfs;
 var pointWfs;
 var popup;
 var selectControl;
-var units;
-
-// START OF FUNCTION FOR TRIP CALULATIONS
-function Units(toangles, fromangles, tolength, fromlength) {
-  this.toAngles = toangles;
-  this.fromAngles = fromangles;
-  this.toLength = tolength;
-  this.fromLength = fromlength;
-}
-//END OF TRIP CALCULATIONS
 
 // START FUNCTIONS FOR THE INFO POPUPS
 function onPopupClose(evt) {
     selectControl.unselect(selectedFeature);
 }
 function buildTable(attrs) {
-  head = "<table>";
+  head = '<table class="popuptable">';
   tail = "</table>";
   cont = "";
   for (key in attrs) {
@@ -36,9 +25,11 @@ function onFeatureSelect(feature) {
     selectedFeature = feature;
     popup = new OpenLayers.Popup.FramedCloud("chicken", 
                              feature.geometry.getBounds().getCenterLonLat(),
-                             null,
-                             "<div style='font-size:.8em'>Attrs: " + buildTable(feature.attributes) + "</div>",
+			     null,
+                             "<div style='font-size:.8em; width: 300px'>Attrs: " + buildTable(feature.attributes) + "</div>",
                              null, true, onPopupClose);
+    popup.maxSize = new OpenLayers.Size(400,300);
+    popup.autoSize = true;
     feature.popup = popup;
     map.addPopup(popup);
 }
@@ -49,71 +40,6 @@ function onFeatureUnselect(feature) {
 }
 // END FUNCTIONS FOR THE INFO POPUPS
 
-function initSlick() {
-    units = new Units(function(t) {
-                        return t * 180 / Math.PI;
-                      },
-                      function(t) {
-                        return t * Math.PI / 180;
-                      },
-                      function(l) {
-                        return l;
-                      },
-                      function(l) {
-                        return l;
-                      });
-    //start SlickGrid
-    var columns = [
-      {id:"number", name:"#", field:"number"},
-      {id:"name", name:"name", field:"name", editor:TextCellEditor},
-      //{id:"lonlat", name:"lonlat", field:"lonlat0"},
-      {id:"hdg", name:"HDG", field:"headingGrid"},
-      {id:"dst", name:"DST", field:"distanceGrid"},
-      {id:"height", name:"HGT", field:"heightGrid", editor:IntegerCellEditor},
-      {id:"magvar", name:"MAG", field:"magvarGrid"},
-      {id:"indicatedAirspeed", name:"IAS", field:"indicatedAirspeedGrid", editor:IntegerCellEditor},
-      {id:"windDirection", name:"wind dir", field:"windDirectionGrid", editor:IntegerCellEditor},
-      {id:"windSpeed", name:"wind speed", field:"windSpeedGrid", editor:IntegerCellEditor},
-      {id:"trueAirspeed", name:"TAS", field:"trueAirspeedGrid"},
-      {id:"groundSpeed", name:"GS", field:"groundSpeedGrid"},
-      {id:"trueHeading", name:"TH", field:"trueHeadingGrid"},
-    ];
-    var options = {enableCellNavigation: true, enableColumnReorder: false, editable: true};
-    grid = new Slick.Grid("#ops_plan", [], columns, options);
-    //$("ops_plan").show();
-}
-
-function update_table(e) {
-  //report(e);
-  update_magvar(e.feature);
-  gen_ops_plan2(e.feature);
-}
-
-function update_magvar(route) {
-  vertexes = [];
-  for (var key=0; key < route.geometry.components.length; key ++) {
-    tmp = route.geometry.components[key];
-    vertexes.push({"lat":tmp.x, "lon":tmp.y, "height":100});
-  }
-  new Ajax.Request('/cgi-bin/magvar.cgi', {
-    method: "post",
-    parameters: {"json": JSON.stringify(vertexes)},
-    onSuccess: function(response) {
-      for (var i=0; i < route.geometry.components.length; i++) {
-        route.geometry.components[i].magvar = response.responseJSON[i].toRad();
-      }
-      grid.setData(route.geometry.components);
-      grid.render();},
-    });
-
-  //$.post("/cgi-bin/magvar.cgi", {"json": JSON.stringify(vertexes)}, function(data){
-  //  for (var i=0; i < route.geometry.components.length; i++) {
-  //    route.geometry.components[i].magvar = data[i].toRad();
-  //  }
-  //  grid.setData(route.geometry.components);
-  //  grid.render();
-  //});
-}
 
 function pointToLonLat(point){
   if (point==undefined){
@@ -123,58 +49,7 @@ function pointToLonLat(point){
   return lonlat;
 }
 
-var radius = 6371;
-//legger til heading og distance på hvert punkt i en feature
-//Vi tar ikke med det siste punktets avstand og retning siden det ikke gir noen mening
-function calculate(components){
-  var i=0;
-  while (i < components.length - 1){
-    components[i].number = i;
-    components[i].indicatedAirspeed = units.fromLength(components[i].indicatedAirspeedGrid);
-    components[i].windDirection = units.fromAngles(components[i].windDirectionGrid);
-    components[i].windSpeed = units.fromLength(components[i].windSpeedGrid);
-    components[i].magvarGrid = units.toAngles(components[i].magvar);
-
-    components[i].trueAirspeed = components[i].indicatedAirspeed;
-    components[i].trueAirspeedGrid = components[i].indicatedAirspeed;
-
-    components[i].lonlat0 = pointToLonLat(components[i]);
-    components[i].lonlat0Grid = components[i].lonlat0;
-
-    components[i].lonlat1 = pointToLonLat(components[i+1]);
-    components[i].lonlat1Grid = components[i].lonlat1;
-
-    out = crsdist(components[i].lonlat0.lat.toRad(), components[i].lonlat0.lon.toRad(), components[i].lonlat1.lat.toRad(), components[i].lonlat1.lon.toRad()); 
-    components[i].heading = out.crs12;
-    components[i].headingGrid = units.toAngles(components[i].heading);
-
-    components[i].distance = out.d * radius;
-    components[i].distanceGrid = units.toLength(components[i].distance);
-
-    var wind = calcWind(components[i].windSpeed, components[i].windDirection, components[i].trueAirspeed, components[i].heading);
-    components[i].trueHeading = wind.crs;
-    components[i].trueHeadingGrid = units.toAngles(components[i].trueHeading);
-
-    components[i].groundSpeed = wind.gs;
-    components[i].groundSpeedGrid = units.toLength(components[i].groundSpeed);
-    i++;
-  }
-
-  //last one
-  components[i].number = i;
-
-  return components;
-}
-
-function gen_ops_plan2(route){
-  route.geometry.components = calculate(route.geometry.components);
-  grid.setData(route.geometry.components);
-  grid.render();
-}
-
-
 function createMap(divName, options) {
-    initSlick();
     OpenLayers.ProxyHost = "/cgi-bin/proxy.cgi?url=";
     map = new OpenLayers.Map('map');
     var topo2 = new OpenLayers.Layer.WMS(
@@ -187,22 +62,6 @@ function createMap(divName, options) {
 	"http://vmap0.tiles.osgeo.org/wms/vmap0?", {layers: 'basic'}); 
     map.addLayer(wms);
 
-    //START OF THE DRAWING LAYER
-    vectors = new OpenLayers.Layer.Vector("Drawing Layer");
-    map.addLayer(vectors);
-
-    if (console && console.log) {
-	vectors.events.on({
-	    "beforefeaturemodified": null,
-	    "featuremodified": update_table,
-	    "afterfeaturemodified": null,
-	    "vertexmodified": null,
-	    "sketchmodified": null,
-	    "sketchstarted": null,
-	    "sketchcomplete": update_table,
-	});
-    }
-    //END OF THE DRAWING LAYER
     //START OF WFS OAM DATA LAYER
 
     var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
@@ -291,15 +150,11 @@ function createMap(divName, options) {
     //END OF WFS OAM DATA LAYER
 
     //START OF SELECT FEATURE THINGY
-    var move = new OpenLayers.Control.DragPan();
-    var draw = new OpenLayers.Control.DrawFeature(vectors,OpenLayers.Handler.Path);
-    var modify = new OpenLayers.Control.ModifyFeature(vectors);
-    var remove = new DeleteFeature(vectors);
     selectControl = new OpenLayers.Control.SelectFeature([wfs, pointWfs],
             {onSelect: onFeatureSelect, onUnselect: onFeatureUnselect});
 
-    var panel = new OpenLayers.Control.Panel({defaultControl: move});
-    panel.addControls([move, draw, modify, remove, selectControl]);
+    var panel = new OpenLayers.Control.Panel({defaultControl: selectControl});
+    panel.addControls([selectControl]);
     map.addControl(panel);
 
     //END OF SELECT FEATURE THINGY
@@ -310,33 +165,6 @@ function createMap(divName, options) {
     map.addControl(new OpenLayers.Control.PanZoomBar());
     return map;
 }
-
-//Control for å slette en feature.
-DeleteFeature = OpenLayers.Class(OpenLayers.Control, {
-    initialize: function(layer, options) {
-        OpenLayers.Control.prototype.initialize.apply(this, [options]);
-        this.layer = layer;
-        this.handler = new OpenLayers.Handler.Feature(
-            this, layer, {click: this.clickFeature}
-        );
-    },
-    clickFeature: function(feature) {
-        // if feature doesn't have a fid, destroy it
-        if(feature.fid == undefined) {
-            this.layer.destroyFeatures([feature]);
-        } else {
-            feature.state = OpenLayers.State.DELETE;
-            this.layer.events.triggerEvent("afterfeaturemodified", {feature: feature});
-            feature.renderIntent = "select";
-            this.layer.drawFeature(feature);
-        }
-    },
-    setMap: function(map) {
-        this.handler.setMap(map);
-        OpenLayers.Control.prototype.setMap.apply(this, arguments);
-    },
-    CLASS_NAME: "OpenLayers.Control.DeleteFeature"
-});
 
 function getArrowIcon() {
    var size = new OpenLayers.Size(25, 22);

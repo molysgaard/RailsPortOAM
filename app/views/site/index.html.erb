@@ -16,19 +16,11 @@
   </div>
 </noscript>
 
-<ul id="viewport" class="subsection_tabs">  
-    <li class="tab"><a href="#map">Map</a></li>  
-    <li class="tab"><a href="#ops_plan">Route</a></li>  
-</ul>  
-
 <div id="map">
   <div id="permalink">
     <a href="/" id="permalinkanchor" class="geolink llz layers object"><%= t 'site.index.permalink' %></a><br/>
     <a href="/" id="shortlinkanchor"><%= t 'site.index.shortlink' %></a>
   </div>
-</div>
-
-<div id="ops_plan">
 </div>
 
 <style type="text/css">
@@ -198,37 +190,9 @@ end
   }
 </script>
 
-<%= javascript_include_tag '/SlickGrid/lib/jquery-1.7.min.js' %>
-<%= javascript_include_tag '/SlickGrid/lib/jquery.event.drag-2.0.min.js' %>
-<%= javascript_include_tag '/SlickGrid/lib/jquery-ui-1.8.16.custom.min.js' %>
-
-<script type="text/javascript">
-  jQuery.noConflict();
-</script>
-
-<%= javascript_include_tag '/livepipe-ui/src/livepipe.js' %>
-<%= javascript_include_tag '/livepipe-ui/src/tabs.js' %>
-
-<script type="text/javascript">
-    new Control.Tabs('viewport');  
-</script>
-
-<%= javascript_include_tag '/SlickGrid/slick.core.js' %>
-<%= javascript_include_tag '/SlickGrid/plugins/slick.cellrangedecorator.js' %>
-<%= javascript_include_tag '/SlickGrid/plugins/slick.cellrangeselector.js' %>
-<%= javascript_include_tag '/SlickGrid/plugins/slick.cellselectionmodel.js' %>
-<%= javascript_include_tag '/SlickGrid/slick.editors.js' %>
-<%= javascript_include_tag '/SlickGrid/slick.grid.js' %>
-
-<%= javascript_include_tag '/math.js' %>
-
 <%= javascript_include_tag '/openlayers/OpenLayers.js' %>
 <%= javascript_include_tag '/OpenStreetMap.js' %>
 <%= javascript_include_tag 'map.js' %>
-
-<link rel="stylesheet" href="/SlickGrid/slick.grid.css" type="text/css" media="screen" charset="utf-8" />
-<link rel="stylesheet" href="/SlickGrid/css/smoothness/jquery-ui-1.8.16.custom.css" type="text/css" media="screen" charset="utf-8" />
-
 
 <%= render :partial => 'resize' %>
 
