@@ -116,17 +116,20 @@ function createMap(divName, options) {
     var pointContext = {
         getGraphic: function(feature) {
             if (feature.attributes["navaid"] == "yes"){
-              return "/icons/vor.svg";
+              return "/icons/navaid.svg";
             }
             if (feature.attributes["aerodrome"] == "yes"){
-              return "/icons/aerodrome.png";
+              return "/icons/aerodrome.svg";
+            }
+            if (feature.attributes["obstacle"] == "yes"){
+              return "/icons/obstacle.svg";
             }
             else {
-              return null;
+              return "/icons/node.svg";
             }
         },
     };
-    var pointTemplate = {pointRadius:15, externalGraphic: "${getGraphic}"};
+    var pointTemplate = {pointRadius:16, externalGraphic: "${getGraphic}"};
 
     var pointStyle = new OpenLayers.Style(pointTemplate, {context:pointContext});
 
