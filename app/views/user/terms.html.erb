@@ -6,7 +6,8 @@
 <%= form_tag :action => 'terms' do %>
   <p>
     <%= t 'user.terms.legale_select' %>
-    <% [['france', 'FR'], ['italy', 'IT'], ['rest_of_world', 'GB']].each do |name,legale| %>
+    <!--% [['france', 'FR'], ['italy', 'IT'], ['rest_of_world', 'GB']].each do |name,legale| %-->
+    <% [['rest_of_world', 'GB']].each do |name,legale| %>
       <%= radio_button_tag 'legale', legale, @legale == legale %>
       <%= label_tag "legale_#{legale}", t('user.terms.legale_names.' + name) %>
       <script type="text/javascript">

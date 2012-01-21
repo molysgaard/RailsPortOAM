@@ -936,12 +936,7 @@ en:
     tag_line: The Free Wiki Aviation Data Map
     intro_1: "OpenAviationMap is a free editable map of aviationdata for the whole world. It is made by people like you."
     intro_2: "OpenAviationMap allows you to view, edit and use aviation data in a collaborative way from anywhere on Earth."
-    intro_3: "OpenAviationMap's hosting is kindly supported by %{ucl}, %{ic} and %{bytemark}. Other supporters of the project are listed in the %{partners}."
-    intro_3_ucl: "the UCL VR Centre"
-    intro_3_ic: "Imperial College London"
-    intro_3_bytemark: "Bytemark Hosting"
-    intro_3_partners: "wiki"
-    intro_3_partners_url: "http://wiki.openaviationmap.org/wiki/Partners"
+    intro_3: "OpenAviationMap is currently hosted on a puny dell workstation by Morten Olsen Lysgaard. NOTE: OpenAviationMap is not affiliated with OpenStreetMap. We are using the the same tecnology and in the beginning there may be references to OpenStreetMap on this page that are incorrect."
     osm_offline: "The OpenAviationMap database is currently offline while essential database maintenance work is carried out."
     osm_read_only: "The OpenAviationMap database is currently in read-only mode while essential database maintenance work is carried out."
     #donate: "Support OpenAviationMap by %{link} to the Hardware Upgrade Fund."
@@ -1005,12 +1000,12 @@ en:
       </p>
       <p>
         Where possible, OpenAviationMap should be hyperlinked to <a
-        href="http://www.openstreetmap.org/">http://www.openstreetmap.org/</a>
+        href="http://www.openaviationmap.org/">http://www.openaviationmap.org/</a>
         and CC-BY-SA to <a
         href="http://creativecommons.org/licenses/by-sa/2.0/">http://creativecommons.org/licenses/by-sa/2.0/</a>. If
         you are using a medium where links are not possible (e.g. a
         printed work), we suggest you direct your readers to
-        www.openstreetmap.org (perhaps by expanding
+        www.openaviationmap.org (perhaps by expanding
         &lsquo;OpenAviationMap&rsquo; to this full address) and to
         www.creativecommons.org.
       </p>
@@ -1018,7 +1013,7 @@ en:
       <h3>Finding out more</h3>
       <p>
         Read more about using our data at the <a
-        href="http://wiki.openstreetmap.org/wiki/Legal_FAQ">Legal
+        href="http://wiki.openaviationmap.org/wiki/Legal_FAQ">Legal
         FAQ</a>.
       </p>
       <p>
@@ -1030,9 +1025,9 @@ en:
         Although OpenAviationMap is open data, we cannot provide a
         free-of-charge map API for third-party developers.
 
-        See our <a href="http://wiki.openstreetmap.org/wiki/API_usage_policy">API Usage Policy</a>,
-        <a href="http://wiki.openstreetmap.org/wiki/Tile_usage_policy">Tile Usage Policy</a>
-        and <a href="http://wiki.openstreetmap.org/wiki/Nominatim#Usage_Policy">Nominatim Usage Policy</a>.
+        See our <a href="http://wiki.openaviationmap.org/wiki/API_usage_policy">API Usage Policy</a>,
+        <a href="http://wiki.openaviationmap.org/wiki/Tile_usage_policy">Tile Usage Policy</a>
+        and <a href="http://wiki.openaviationmap.org/wiki/Nominatim#Usage_Policy">Nominatim Usage Policy</a>.
       </p>
 
       <h3>Our contributors</h3>
@@ -1135,7 +1130,7 @@ en:
       opengeodata: "OpenGeoData.org is OpenAviationMap founder Steve Coast's blog, and it has podcasts too:"
       ask_questions: "You can ask any questions you may have about OpenAviationMap at our question and answer site:"
       wiki_signup: "You may also want to sign up to the OpenAviationMap wiki at:"
-      wiki_signup_url: "http://wiki.openstreetmap.org/index.php?title=Special:Userlogin&type=signup&returnto=Main_Page"
+      wiki_signup_url: "http://wiki.openaviationmap.org/index.php?title=Special:Userlogin&type=signup&returnto=Main_Page"
       # next four translations are in pairs : please word wrap appropriately
       user_wiki_1: "It is recommended that you create a user wiki page, which includes"
       user_wiki_2: "category tags noting where you are, such as [[Category:Users_in_London]]."
@@ -1151,7 +1146,7 @@ en:
       more_videos_here: "more videos here"
       get_reading: Get reading about OpenAviationMap <a href="http://wiki.openstreetmap.org/wiki/Beginners%27_Guide">on the wiki</a>, catch up with the latest news via the <a href="http://blog.openstreetmap.org/">OpenAviationMap blog</a> or <a href="http://twitter.com/openstreetmap">Twitter</a>, or browse through OpenAviationMap founder Steve Coast's <a href="http://www.opengeodata.org/">OpenGeoData blog</a> for the potted history of the project, which has <a href="http://www.opengeodata.org/?cat=13">podcasts to listen to</a> also!
       ask_questions: You can ask any questions you may have about OpenAviationMap at our <a href="http://help.openstreetmap.org/">question and answer site</a>.
-      wiki_signup: 'You may also want to <a href="http://wiki.openstreetmap.org/index.php?title=Special:Userlogin&type=signup&returnto=Main_Page">sign up to the OpenAviationMap wiki</a>.'
+      wiki_signup: 'You may also want to <a href="http://wiki.openaviationmap.org/index.php?title=Special:Userlogin&type=signup&returnto=Main_Page">sign up to the OpenAviationMap wiki</a>.'
       user_wiki_page: 'It is recommended that you create a user wiki page, which includes category tags noting where you are, such as <a href="http://wiki.openstreetmap.org/wiki/Category:Users_in_London">[[Category:Users_in_London]]</a>.'
       current_user: 'A list of current users in categories, based on where in the world they are, is available from <a href="http://wiki.openstreetmap.org/wiki/Category:Users_by_geographical_region">Category:Users_by_geographical_region</a>.'
     email_confirm:
@@ -1170,11 +1165,11 @@ en:
     lost_password_plain:
       greeting: "Hi,"
       hopefully_you_1: "Someone (possibly you) has asked for the password to be reset on this"
-      hopefully_you_2: "email addresses openstreetmap.org account."
+      hopefully_you_2: "email addresses openaviationmap.org account."
       click_the_link: "If this is you, please click the link below to reset your password."
     lost_password_html:
       greeting: "Hi,"
-      hopefully_you: "Someone (possibly you) has asked for the password to be reset on this email address's openstreetmap.org account."
+      hopefully_you: "Someone (possibly you) has asked for the password to be reset on this email address's openaviationmap.org account."
       click_the_link: "If this is you, please click the link below to reset your password."
   message:
     inbox:
@@ -1246,7 +1241,7 @@ en:
     index:
       js_1: "You are either using a browser that does not support JavaScript, or you have disabled JavaScript."
       js_2: "OpenAviationMap uses JavaScript for its slippy map."
-      js_3: 'You may want to try the <a href="http://tah.openstreetmap.org/Browse/">Tiles@Home static tile browser</a> if you are unable to enable JavaScript.'
+      js_3: 'You may want to try the <a href="http://tah.openaviationmap.org/Browse/">Tiles@Home static tile browser</a> if you are unable to enable JavaScript.'
       permalink: Permalink
       shortlink: Shortlink
       license:
@@ -1254,7 +1249,7 @@ en:
         license_name: "Creative Commons Attribution-Share Alike 2.0"
         license_url: "http://creativecommons.org/licenses/by-sa/2.0/"
         project_name: "OpenAviationMap project"
-        project_url: "http://openstreetmap.org"
+        project_url: "http://openaviationmap.org"
       remote_failed: "Editing failed - make sure JOSM or Merkaartor is loaded and the remote control option is enabled"
     edit:
       not_public: "You have not set your edits to be public."
@@ -1588,7 +1583,7 @@ en:
       title: "Create account"
       heading: "Create a User Account"
       no_auto_account_create: "Unfortunately we are not currently able to create an account for you automatically."
-      contact_webmaster: 'Please contact the <a href="mailto:webmaster@openstreetmap.org">webmaster</a> to arrange for an account to be created - we will try and deal with the request as quickly as possible.'
+      contact_webmaster: 'Please contact the <a href="mailto:webmaster@openaviationmap.org">webmaster</a> to arrange for an account to be created - we will try and deal with the request as quickly as possible.'
       fill_form: "Fill in the form and we will send you a quick email to activate your account."
       license_agreement: 'When you confirm your account you will need to agree to the <a href="http://www.osmfoundation.org/wiki/License/Contributor_Terms">contributor terms</a>.'
       email address: "Email Address:"
@@ -1612,7 +1607,7 @@ en:
           </li>
         </ul>
       continue: Continue
-      flash create success message: "Thanks for signing up. We've sent a confirmation note to %{email} and as soon as you confirm your account you'll be able to get mapping.<br /><br />If you use an antispam system which sends confirmation requests then please make sure you whitelist webmaster@openstreetmap.org as we are unable to reply to any confirmation requests."
+      flash create success message: "Thanks for signing up. We've sent a confirmation note to %{email} and as soon as you confirm your account you'll be able to get mapping.<br /><br />If you use an antispam system which sends confirmation requests then please make sure you whitelist webmaster@openaviation.org as we are unable to reply to any confirmation requests."
       terms accepted: "Thanks for accepting the new contributor terms!"
       terms declined: "We are sorry that you have decided to not accept the new Contributor Terms. For more information, please see <a href=\"%{url}\">this wiki page</a>."
       terms declined url: http://wiki.openstreetmap.org/wiki/Contributor_Terms_Declined
@@ -1749,7 +1744,7 @@ en:
       unknown token: "That token doesn't seem to exist."
       reconfirm: "If it's been a while since you signed up you might need to <a href=\"%{reconfirm}\">send yourself a new confirmation email</a>."
     confirm_resend:
-      success: "We've sent a new confirmation note to %{email} and as soon as you confirm your account you'll be able to get mapping.<br /><br />If you use an antispam system which sends confirmation requests then please make sure you whitelist webmaster@openstreetmap.org as we are unable to reply to any confirmation requests."
+      success: "We've sent a new confirmation note to %{email} and as soon as you confirm your account you'll be able to get mapping.<br /><br />If you use an antispam system which sends confirmation requests then please make sure you whitelist webmaster@openaviationmap.org as we are unable to reply to any confirmation requests."
       failure: "User %{name} not found."
     confirm_email:
       heading: Confirm a change of email address

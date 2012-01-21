@@ -7,3 +7,6 @@
 [submodule "public/livepipe-ui"]
 	path = public/livepipe-ui
 	url = git://github.com/saucytiger/livepipe-ui.git
+[submodule "public/icons"]
+	path = public/icons
+	url = git://github.com/molysgaard/OAM-Icons.git

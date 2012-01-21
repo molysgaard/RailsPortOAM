@@ -115,15 +115,30 @@ function createMap(divName, options) {
 
     var pointContext = {
         getGraphic: function(feature) {
+            //Start of navaid
             if (feature.attributes["navaid"] == "yes"){
-              return "/icons/navaid.svg";
-            }
+              if (feature.attributes["navaid:ndb"] != null){
+                return "/icons/renders/32/ndb.png";
+              }
+	      if (feature.attributes["navaid:vor"] != null){
+                if (feature.attributes["navaid:dme"] != null){
+                  return "/icons/renders/32/vor_dme.png";
+                }
+		if (feature.attributes["navaid:tacan"] != null){
+                  return "/icons/renders/32/vor_tacan.png";
+                }
+		else {
+                  return "/icons/renders/32/vor.png";
+                }
+              }
+              return "/icons/renders/32/navaid.png";
+            }//Start of aerodrome
             if (feature.attributes["aerodrome"] == "yes"){
-              return "/icons/aerodrome.svg";
-            }
+              return "/icons/renders/32/aerodrome.png";
+            }//Start of obstacle
             if (feature.attributes["obstacle"] == "yes"){
-              return "/icons/obstacle.svg";
-            }
+              return "/icons/renders/32/obstacle.png";
+            }//Start of node catch all
             else {
               return "/icons/node.svg";
             }
