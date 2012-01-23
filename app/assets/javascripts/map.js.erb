@@ -117,9 +117,6 @@ function createMap(divName, options) {
         getGraphic: function(feature) {
             //Start of navaid
             if (feature.attributes["navaid"] == "yes"){
-              if (feature.attributes["navaid:ndb"] != null){
-                return "/icons/renders/32/ndb.png";
-              }
 	      if (feature.attributes["navaid:vor"] != null){
                 if (feature.attributes["navaid:dme"] != null){
                   return "/icons/renders/32/vor_dme.png";
@@ -131,6 +128,15 @@ function createMap(divName, options) {
                   return "/icons/renders/32/vor.png";
                 }
               }
+              if (feature.attributes["navaid:ndb"] != null){
+                return "/icons/renders/32/ndb.png";
+              }
+              if (feature.attributes["navaid:dme"] != null){
+                return "/icons/renders/32/dme.png";
+              }
+              if (feature.attributes["navaid:tacan"] != null){
+                return "/icons/renders/32/tacan.png";
+              }
               return "/icons/renders/32/navaid.png";
             }//Start of aerodrome
             if (feature.attributes["aerodrome"] == "yes"){
@@ -138,9 +144,12 @@ function createMap(divName, options) {
             }//Start of obstacle
             if (feature.attributes["obstacle"] == "yes"){
               return "/icons/renders/32/obstacle.png";
+	    }//Start of reporting points
+            if (feature.attributes["vfrreportingpoint"] == "yes"){
+              return "/icons/renders/32/vfrreportingpoint.png";
             }//Start of node catch all
             else {
-              return "/icons/node.svg";
+              return "/icons/renders/32/node.png";
             }
         },
     };
