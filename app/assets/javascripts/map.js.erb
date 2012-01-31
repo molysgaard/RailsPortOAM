@@ -8,7 +8,6 @@ var mapserverLine;
 var popup;
 var selectControl;
 
-<<<<<<< HEAD
 // START FUNCTIONS FOR THE INFO POPUPS
 function onPopupClose(evt) {
     selectControl.unselect(selectedFeature);
@@ -24,7 +23,7 @@ function buildTable(attrs) {
   }
   return (head + cont + tail);
 }
-=======
+
 function createMap(divName, options) {
    options = options || {};
 
@@ -44,7 +43,6 @@ function createMap(divName, options) {
       displayProjection: new OpenLayers.Projection("EPSG:4326"),
       theme: "<%= asset_path 'theme/default/style.css' %>"
    });
->>>>>>> upstream/master
 
 //function buildTable2(attrs) {
 //  head = '<table class="popuptable">';

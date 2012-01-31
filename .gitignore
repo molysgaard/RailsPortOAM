@@ -3,3 +3,4 @@ tmp
 .DS_Store
 .htaccess
 public/openlayers/OpenLayers.js
+Gemfile.lock
