@@ -7,8 +7,8 @@ gem 'rails', '3.1.3'
 # Require the postgres database driver
 gem 'pg'
 
-# Load prototype support
-gem 'prototype-rails'
+# Load jquery support
+gem 'jquery-rails'
 
 # Load rails plugins
 gem 'rails-i18n-updater'
@@ -17,7 +17,10 @@ gem 'rinku', '>= 1.2.2', :require => 'rails_rinku'
 gem 'oauth-plugin', '>= 0.4.0.pre7'
 gem 'open_id_authentication', '>= 1.1.0'
 gem 'validates_email_format_of', '>= 1.5.1'
-gem 'composite_primary_keys', '>= 4.1.1'
+gem 'composite_primary_keys', '>= 4.1.2'
+
+# Character conversion support for ruby 1.8
+gem 'iconv', :platforms => :ruby_18
 
 # Load libxml support for XML parsing and generation
 gem 'libxml-ruby', '>= 2.0.5', :require => 'libxml'
@@ -29,7 +32,7 @@ gem 'rmagick', :require => 'RMagick'
 gem 'sanitize'
 
 # Load SystemTimer for implementing request timeouts
-gem 'SystemTimer', '>= 1.1.3', :require => 'system_timer'
+gem 'SystemTimer', '>= 1.1.3', :require => 'system_timer', :platforms => :ruby_18
 
 # Load httpclient for SOAP support for Quova GeoIP queries
 gem 'httpclient'

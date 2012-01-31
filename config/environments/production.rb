@@ -55,9 +55,10 @@ OpenStreetMap::Application.configure do
 
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
   config.assets.precompile += %w( map.js menu.js pngfix.js site.js swfobject.js )
+  config.assets.precompile += %w( openlayers.js )
   config.assets.precompile += %w( large-ltr.css small-ltr.css print-ltr.css )
   config.assets.precompile += %w( large-rtl.css small-rtl.css print-rtl.css )
-  config.assets.precompile += %w( browse.css )
+  config.assets.precompile += %w( browse.css theme/default/style.css )
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false

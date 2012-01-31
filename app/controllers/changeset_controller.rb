@@ -174,16 +174,12 @@ class ChangesetController < ApplicationController
           created = XML::Node.new "create"
           created << elt.to_xml_node
         else
-          # get the previous version from the element history
-          prev_elt = elt.class.find([elt.id, elt.version])
           unless elt.visible
-            # if the element isn't visible then it must have been deleted, so
-            # output the *previous* XML
+            # if the element isn't visible then it must have been deleted
             deleted = XML::Node.new "delete"
-            deleted << prev_elt.to_xml_node
+            deleted << elt.to_xml_node
           else
-            # must be a modify, for which we don't need the previous version
-            # yet...
+            # must be a modify
             modified = XML::Node.new "modify"
             modified << elt.to_xml_node
           end
@@ -270,6 +266,24 @@ class ChangesetController < ApplicationController
           return
         end
       end
+      
+      if params[:friends]
+        if @user
+          changesets = changesets.where(:user_id => @user.friend_users.public)
+        elsif request.format == :html
+          require_user
+          return
+        end
+      end
+
+      if params[:nearby]
+        if @user
+          changesets = changesets.where(:user_id => @user.nearby)
+        elsif request.format == :html
+          require_user
+          return
+        end
+      end
 
       if params[:bbox]
         bbox = BoundingBox.from_bbox_params(params)
@@ -286,7 +300,15 @@ class ChangesetController < ApplicationController
         user_link = render_to_string :partial => "user", :object => user
       end
       
-      if user and bbox
+      if params[:friends] and @user
+        @title =  t 'changeset.list.title_friend'
+        @heading =  t 'changeset.list.heading_friend'
+        @description = t 'changeset.list.description_friend'
+      elsif params[:nearby] and @user
+        @title = t 'changeset.list.title_nearby'
+        @heading = t 'changeset.list.heading_nearby'
+        @description = t 'changeset.list.description_nearby'
+      elsif user and bbox
         @title =  t 'changeset.list.title_user_bbox', :user => user.display_name, :bbox => bbox.to_s
         @heading =  t 'changeset.list.heading_user_bbox', :user => user.display_name, :bbox => bbox.to_s
         @description = t 'changeset.list.description_user_bbox', :user => user_link, :bbox => bbox_link

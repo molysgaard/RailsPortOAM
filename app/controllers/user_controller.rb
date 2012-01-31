@@ -23,9 +23,7 @@ class UserController < ApplicationController
     @text = OSM.legal_text_for_country(@legale)
 
     if request.xhr?
-      render :update do |page|
-        page.replace_html "contributorTerms", :partial => "terms"
-      end
+      render :partial => "terms"
     elsif using_open_id?
       # The redirect from the OpenID provider reenters here
       # again and we need to pass the parameters through to
@@ -168,9 +166,10 @@ class UserController < ApplicationController
         @user.preferred_editor = params[:user][:preferred_editor]
       end
 
-      @user.openid_url = nil if params[:user][:openid_url].empty?
+      @user.openid_url = nil if params[:user][:openid_url].blank?
 
-      if params[:user][:openid_url].length > 0 and
+      if params[:user][:openid_url] and
+         params[:user][:openid_url].length > 0 and
          params[:user][:openid_url] != @user.openid_url
         # If the OpenID has changed, we want to check that it is a
         # valid OpenID and one the user has control over before saving
@@ -188,13 +187,6 @@ class UserController < ApplicationController
       openid_verify(nil, @user) do |user|
         update_user(user)
       end
-    else
-      if flash[:errors]
-        flash[:errors].each do |attr,msg|
-          attr = "new_email" if attr == "email" and !@user.new_email.nil?
-          @user.errors.add(attr,msg)
-        end
-      end
     end
   end
 
@@ -209,7 +201,15 @@ class UserController < ApplicationController
     @title = t 'user.lost_password.title'
 
     if params[:user] and params[:user][:email]
-      user = User.visible.where(:email => params[:user][:email]).first
+      user = User.visible.find_by_email(params[:user][:email])
+
+      if user.nil?
+        users = User.visible.where("LOWER(email) = LOWER(?)", params[:user][:email])
+
+        if users.count == 1
+          user = users.first
+        end
+      end
 
       if user
         token = user.tokens.create
@@ -282,6 +282,8 @@ class UserController < ApplicationController
       else
         password_authentication(params[:username], params[:password])
       end
+    elsif params[:notice]
+      flash.now[:notice] = t "user.login.notice_#{params[:notice]}"
     elsif flash[:notice].nil?
       flash.now[:notice] =  t 'user.login.notice'
     end
@@ -510,8 +512,7 @@ private
     elsif user = User.authenticate(:username => username, :password => password, :pending => true)
       failed_login t('user.login.account not active', :reconfirm => url_for(:action => 'confirm_resend', :display_name => user.display_name))
     elsif User.authenticate(:username => username, :password => password, :suspended => true)
-      webmaster = link_to t('user.login.webmaster'), "mailto:webmaster@openstreetmap.org"
-      failed_login t('user.login.account suspended', :webmaster => webmaster)
+      failed_login t('user.login.account is suspended', :webmaster => "mailto:webmaster@openstreetmap.org")
     else
       failed_login t('user.login.auth failure')
     end
@@ -544,8 +545,7 @@ private
             when "active", "confirmed" then
               successful_login(user)
             when "suspended" then
-              webmaster = link_to t('user.login.webmaster'), "mailto:webmaster@openstreetmap.org"
-              failed_login t('user.login.account suspended', :webmaster => webmaster)
+              failed_login t('user.login.account is suspended', :webmaster => "mailto:webmaster@openstreetmap.org")
             else
               failed_login t('user.login.auth failure')
           end
@@ -659,16 +659,25 @@ private
     if user.save
       set_locale
 
-      if user.new_email.nil? or user.new_email.empty?
+      if user.new_email.blank?
         flash.now[:notice] = t 'user.account.flash update success'
       else
-        flash.now[:notice] = t 'user.account.flash update success confirm needed'
+        user.email = user.new_email
 
-        begin
-          Notifier.email_confirm(user, user.tokens.create).deliver
-        rescue
-          # Ignore errors sending email
+        if user.valid?
+          flash.now[:notice] = t 'user.account.flash update success confirm needed'
+
+          begin
+            Notifier.email_confirm(user, user.tokens.create).deliver
+          rescue
+            # Ignore errors sending email
+          end
+        else
+          @user.errors.set(:new_email, @user.errors.get(:email))
+          @user.errors.set(:email, [])
         end
+
+        user.reset_email!
       end
     end
   end
