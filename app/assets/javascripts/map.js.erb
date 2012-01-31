@@ -3,6 +3,8 @@ var map;
 var markers;
 var wfs;
 var pointWfs;
+var mapserver;
+var mapserverLine;
 var popup;
 var selectControl;
 
@@ -21,6 +23,28 @@ function buildTable(attrs) {
   }
   return (head + cont + tail);
 }
+
+//function buildTable2(attrs) {
+//  head = '<table class="popuptable">';
+//  tail = "</table>";
+//  cont = "";
+//  keyVals = attrs['nodetags'].split('", "');
+//  for (var i=0; i<keyVals.length; i++) {
+//      var kv = keyVals[i].split('"=>"');
+//      cont = cont + "<tr><td>" + kv[0].toString() + "</td><td>" + kv[1].toString() + "</td></tr>";
+//  }
+//
+//  if (attrs['tags']!="") {
+//      keyVals = attrs['tags'].split('", "');
+//      for (var i=0; i<keyVals.length; i++) {
+//          var kv = keyVals[i].split('"=>"');
+//          cont = cont + "<tr><td>" + "REL:" + kv[0].toString() + "</td><td>" + kv[1].toString() + "</td></tr>";
+//      }
+//  }
+//  return (head + cont + tail);
+//
+//}
+
 function onFeatureSelect(feature) {
     selectedFeature = feature;
     popup = new OpenLayers.Popup.FramedCloud("chicken", 
@@ -52,6 +76,12 @@ function pointToLonLat(point){
 function createMap(divName, options) {
     OpenLayers.ProxyHost = "/cgi-bin/proxy.cgi?url=";
     map = new OpenLayers.Map('map');
+    var gphy = new OpenLayers.Layer.Google(
+        "Google Physical",
+        {type: google.maps.MapTypeId.TERRAIN}
+    );
+    map.addLayer(gphy);
+
     var topo2 = new OpenLayers.Layer.WMS(
 		"Topografisk norgeskart2","http://opencache.statkart.no/gatekeeper/gk/gk.open?",
 		{layers: 'kartdata2', format: 'image/jpeg',
@@ -176,9 +206,39 @@ function createMap(divName, options) {
     map.addLayer(pointWfs);
     //END OF WFS OAM DATA LAYER
 
+    //MAPSERVER WFS TEST
+    //mapserver = new OpenLayers.Layer.Vector("mapserver test", {
+    //    strategies: [new OpenLayers.Strategy.BBOX()],
+    //    protocol: new OpenLayers.Protocol.WFS({
+    //        url: "http://openaviationmap.org/cgi-bin/mapserv?map=../test.map",
+    //        featureType: "LayerName",
+    //        version: "1.0.0",
+    //        srsName: "EPSG:4326",
+    //        geometryName: "the_geom",
+    //    }),
+    //    projection: "EPSG:4326",
+    //});
+    //map.addLayer(mapserver);
+
+    //mapserverLine = new OpenLayers.Layer.Vector("mapserver test", {
+    //    strategies: [new OpenLayers.Strategy.BBOX()],
+    //    protocol: new OpenLayers.Protocol.WFS({
+    //        url: "http://openaviationmap.org/cgi-bin/mapserv?map=../test.map",
+    //        featureType: "LineLayer",
+    //        version: "1.0.0",
+    //        srsName: "EPSG:4326",
+    //        geometryName: "the_geom",
+    //    }),
+    //    projection: "EPSG:4326",
+    //});
+    //map.addLayer(mapserverLine);
+    //END MAPSERVER POINT TEST
+
     //START OF SELECT FEATURE THINGY
-    selectControl = new OpenLayers.Control.SelectFeature([wfs, pointWfs],
+    selectControl = new OpenLayers.Control.SelectFeature([wfs,pointWfs],
             {onSelect: onFeatureSelect, onUnselect: onFeatureUnselect});
+    //selectControl = new OpenLayers.Control.SelectFeature([wfs, pointWfs],
+    //        {onSelect: onFeatureSelect, onUnselect: onFeatureUnselect});
 
     var panel = new OpenLayers.Control.Panel({defaultControl: selectControl});
     panel.addControls([selectControl]);
