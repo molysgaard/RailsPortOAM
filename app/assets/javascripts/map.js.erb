@@ -3,8 +3,9 @@ var map;
 var markers;
 var wfs;
 var pointWfs;
-var mapserver;
+var mapserverNode;
 var mapserverLine;
+var mapserverArea;
 var popup;
 var selectControl;
 
@@ -24,35 +25,66 @@ function buildTable(attrs) {
   return (head + cont + tail);
 }
 
-//function buildTable2(attrs) {
+//function buildTable(attrs) {
 //  head = '<table class="popuptable">';
 //  tail = "</table>";
 //  cont = "";
-//  keyVals = attrs['nodetags'].split('", "');
+//  keyVals = attrs['tags'].slice(1,-1).split('", "');
+//  cont = cont + '<tr><td colspan="2"><center><b>FEATURE TAGS</b></center></td></tr>';
 //  for (var i=0; i<keyVals.length; i++) {
 //      var kv = keyVals[i].split('"=>"');
 //      cont = cont + "<tr><td>" + kv[0].toString() + "</td><td>" + kv[1].toString() + "</td></tr>";
 //  }
 //
-//  if (attrs['tags']!="") {
-//      keyVals = attrs['tags'].split('", "');
+//  if (attrs['rel_tags']!="" && attrs['rel_tags'] != undefined) {
+//      cont = cont + '<tr><td colspan="2"><center><b>RELATION TAGS</b></center></td></tr>';
+//      keyVals = attrs['rel_tags'].slice(1,-1).split('", "');
 //      for (var i=0; i<keyVals.length; i++) {
 //          var kv = keyVals[i].split('"=>"');
-//          cont = cont + "<tr><td>" + "REL:" + kv[0].toString() + "</td><td>" + kv[1].toString() + "</td></tr>";
+//          cont = cont + "<tr><td>" + kv[0].toString() + "</td><td>" + kv[1].toString() + "</td></tr>";
 //      }
 //  }
 //  return (head + cont + tail);
 //
 //}
 
+var OamFormatClass = OpenLayers.Class(OpenLayers.Format.GML, {
+    read: function(data) {
+        gmlParser = new OpenLayers.Format.GML();
+	features = gmlParser.read(data);
+        //Add feature tags
+        for (var j=0; j<features.length; j++) {
+            //Add the relation tags first, this is because feature tags should overwrite relation tags.
+            if (features[j].attributes['rel_tags'] != null){
+                keyVals = features[j].attributes['rel_tags'].slice(1,-1).split('", "');
+                for (var i=0; i<keyVals.length; i++) {
+                    var kv = keyVals[i].split('"=>"');
+	            features[j].attributes[kv[0].toString()] = kv[1].toString();
+                }
+		delete features[j].attributes['rel_tags'];
+            }
+
+            if (features[j].attributes['tags'] != null){
+                keyVals = features[j].attributes['tags'].slice(1,-1).split('", "');
+                for (var i=0; i<keyVals.length; i++) {
+                    var kv = keyVals[i].split('"=>"');
+	            features[j].attributes[kv[0].toString()] = kv[1].toString();
+                }
+		delete features[j].attributes['tags'];
+            }
+	}
+	return features;
+    }
+});
+
 function onFeatureSelect(feature) {
     selectedFeature = feature;
     popup = new OpenLayers.Popup.FramedCloud("chicken", 
                              feature.geometry.getBounds().getCenterLonLat(),
 			     null,
-                             "<div style='font-size:.8em; width: 300px'>Attrs: " + buildTable(feature.attributes) + "</div>",
+                             "<div style='font-size:.8em; width: 300px'>" + buildTable(feature.attributes) + "</div>",
                              null, true, onPopupClose);
-    popup.maxSize = new OpenLayers.Size(400,300);
+    popup.maxSize = new OpenLayers.Size(600,400);
     popup.autoSize = true;
     feature.popup = popup;
     map.addPopup(popup);
@@ -92,12 +124,11 @@ function createMap(divName, options) {
 	"http://vmap0.tiles.osgeo.org/wms/vmap0?", {layers: 'basic'}); 
     map.addLayer(wms);
 
-    //START OF WFS OAM DATA LAYER
-
+    //START OF OAM STYLES
     var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
     renderer = (renderer) ? [renderer] : OpenLayers.Layer.Vector.prototype.renderers;
 
-    var airspaceContext = {
+    var areaContext = {
         getFillColor: function(feature) {
             if (feature.attributes["airspace"] == "yes"){
               return "blue";
@@ -119,42 +150,24 @@ function createMap(divName, options) {
             }
         },
     };
-    var airspaceTemplate = {fillColor: "${getFillColor}",
+    var areaTemplate = {fillColor: "${getFillColor}",
                     strokeColor: "${getStrokeColor}",
                     fillOpacity: "${getFillOpacity}",
                     strokeOpacity: "${getStrokeOpacity}"};
-    var airspaceStyle = new OpenLayers.Style(airspaceTemplate, {context:airspaceContext});
-
-    wfs = new OpenLayers.Layer.Vector("Geoserver WFS", {
-        strategies: [new OpenLayers.Strategy.BBOX()],
-        protocol: new OpenLayers.Protocol.WFS({
-            url: "http://openaviationmap.org:8080/geoserver/wfs",
-            featureType: "planet_osm_polygon",
-            featureNS: "http://openaviationmap.org",
-            geometryName: "way",
-            srsName: "EPS900913",
-	    // the reason for json is that firefox does not parse xml with colons
-	    outputFormat: "json",
-	    readFormat: new OpenLayers.Format.GeoJSON(),
-        }),
-        styleMap: new OpenLayers.StyleMap(airspaceStyle),
-        projection: "EPSG:900913",
-        renderers: renderer,
-    });
-    map.addLayer(wfs);
+    var areaStyle = new OpenLayers.Style(areaTemplate, {context:areaContext});
 
     var pointContext = {
         getGraphic: function(feature) {
             //Start of navaid
             if (feature.attributes["navaid"] == "yes"){
-	      if (feature.attributes["navaid:vor"] != null){
+              if (feature.attributes["navaid:vor"] != null){
                 if (feature.attributes["navaid:dme"] != null){
                   return "/icons/renders/32/vor_dme.png";
                 }
-		if (feature.attributes["navaid:tacan"] != null){
+        	if (feature.attributes["navaid:tacan"] != null){
                   return "/icons/renders/32/vor_tacan.png";
                 }
-		else {
+        	else {
                   return "/icons/renders/32/vor.png";
                 }
               }
@@ -174,7 +187,7 @@ function createMap(divName, options) {
             }//Start of obstacle
             if (feature.attributes["obstacle"] == "yes"){
               return "/icons/renders/32/obstacle.png";
-	    }//Start of reporting points
+            }//Start of reporting points
             if (feature.attributes["vfrreportingpoint"] == "yes"){
               return "/icons/renders/32/vfrreportingpoint.png";
             }//Start of node catch all
@@ -186,59 +199,44 @@ function createMap(divName, options) {
     var pointTemplate = {pointRadius:16, externalGraphic: "${getGraphic}"};
 
     var pointStyle = new OpenLayers.Style(pointTemplate, {context:pointContext});
-
-    pointWfs = new OpenLayers.Layer.Vector("Geoserver pointWfs", {
-        strategies: [new OpenLayers.Strategy.BBOX()],
-        protocol: new OpenLayers.Protocol.WFS({
-            url: "http://openaviationmap.org:8080/geoserver/wfs",
-            featureType: "planet_osm_point",
-            featureNS: "http://openaviationmap.org",
-            geometryName: "way",
-            srsName: "EPS900913",
-	    // the reason for json is that firefox does not parse xml with colons
-	    outputFormat: "json",
-	    readFormat: new OpenLayers.Format.GeoJSON(),
-        }),
-        styleMap: new OpenLayers.StyleMap(pointStyle),
-        projection: "EPSG:900913",
-        renderers: renderer,
-    });
-    map.addLayer(pointWfs);
-    //END OF WFS OAM DATA LAYER
+    //END OAM STYLES
 
     //MAPSERVER WFS TEST
-    //mapserver = new OpenLayers.Layer.Vector("mapserver test", {
-    //    strategies: [new OpenLayers.Strategy.BBOX()],
-    //    protocol: new OpenLayers.Protocol.WFS({
-    //        url: "http://openaviationmap.org/cgi-bin/mapserv?map=../test.map",
-    //        featureType: "LayerName",
-    //        version: "1.0.0",
-    //        srsName: "EPSG:4326",
-    //        geometryName: "the_geom",
-    //    }),
-    //    projection: "EPSG:4326",
-    //});
-    //map.addLayer(mapserver);
+    mapserverArea = new OpenLayers.Layer.Vector("mapserver area test", {
+        strategies: [new OpenLayers.Strategy.BBOX()],
+        protocol: new OpenLayers.Protocol.WFS({
+            url: "http://openaviationmap.org/cgi-bin/mapserv?map=../test.map",
+            featureType: "LysWfsArea",
+            version: "1.0.0",
+            srsName: "EPSG:4326",
+            geometryName: "the_geom",
+            readFormat: new OamFormatClass(),
+        }),
+        projection: "EPSG:4326",
+        styleMap: new OpenLayers.StyleMap(areaStyle),
+        renderers: renderer,
+    });
+    map.addLayer(mapserverArea);
 
-    //mapserverLine = new OpenLayers.Layer.Vector("mapserver test", {
-    //    strategies: [new OpenLayers.Strategy.BBOX()],
-    //    protocol: new OpenLayers.Protocol.WFS({
-    //        url: "http://openaviationmap.org/cgi-bin/mapserv?map=../test.map",
-    //        featureType: "LineLayer",
-    //        version: "1.0.0",
-    //        srsName: "EPSG:4326",
-    //        geometryName: "the_geom",
-    //    }),
-    //    projection: "EPSG:4326",
-    //});
-    //map.addLayer(mapserverLine);
-    //END MAPSERVER POINT TEST
+    mapserverNode = new OpenLayers.Layer.Vector("mapserver node test", {
+        strategies: [new OpenLayers.Strategy.BBOX()],
+        protocol: new OpenLayers.Protocol.WFS({
+            url: "http://openaviationmap.org/cgi-bin/mapserv?map=../test.map",
+            featureType: "LysWfsNode",
+            version: "1.0.0",
+            srsName: "EPSG:4326",
+            geometryName: "the_geom",
+            readFormat: new OamFormatClass(),
+        }),
+        projection: "EPSG:4326",
+        styleMap: new OpenLayers.StyleMap(pointStyle),
+        renderers: renderer,
+    });
+    map.addLayer(mapserverNode);
 
     //START OF SELECT FEATURE THINGY
-    selectControl = new OpenLayers.Control.SelectFeature([wfs,pointWfs],
+    selectControl = new OpenLayers.Control.SelectFeature([mapserverNode,mapserverArea],
             {onSelect: onFeatureSelect, onUnselect: onFeatureUnselect});
-    //selectControl = new OpenLayers.Control.SelectFeature([wfs, pointWfs],
-    //        {onSelect: onFeatureSelect, onUnselect: onFeatureUnselect});
 
     var panel = new OpenLayers.Control.Panel({defaultControl: selectControl});
     panel.addControls([selectControl]);
