@@ -24,26 +24,6 @@ function buildTable(attrs) {
   return (head + cont + tail);
 }
 
-function createMap(divName, options) {
-   options = options || {};
-
-   map = new OpenLayers.Map(divName, {
-      controls: options.controls || [
-         new OpenLayers.Control.ArgParser(),
-         new OpenLayers.Control.Attribution(),
-         new OpenLayers.Control.LayerSwitcher(),
-         new OpenLayers.Control.Navigation(),
-         new OpenLayers.Control.PanZoom(),
-         new OpenLayers.Control.PanZoomBar(),
-         new OpenLayers.Control.ScaleLine({geodesic: true})
-      ],
-      units: "m",
-      maxResolution: 156543.0339,
-      numZoomLevels: 20,
-      displayProjection: new OpenLayers.Projection("EPSG:4326"),
-      theme: "<%= asset_path 'theme/default/style.css' %>"
-   });
-
 //function buildTable2(attrs) {
 //  head = '<table class="popuptable">';
 //  tail = "</table>";
