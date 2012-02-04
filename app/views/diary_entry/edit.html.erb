@@ -64,8 +64,8 @@
 
     var lonlat = getEventPosition(e);
 
-    $$("latitude").value = lonlat.lat;
-    $$("longitude").value = lonlat.lon;
+    $("#latitude").val(lonlat.lat);
+    $("#longitude").val(lonlat.lon);
 
     if (marker) {
       removeMarkerFromMap(marker);
