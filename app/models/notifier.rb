@@ -2,6 +2,7 @@ class Notifier < ActionMailer::Base
   default :from => EMAIL_FROM,
           :return_path => EMAIL_RETURN_PATH,
           :auto_submitted => "auto-generated"
+  helper :application
 
   def signup_confirm(user, token)
     @locale = user.preferred_language_from(I18n.available_locales)
@@ -80,7 +81,7 @@ class Notifier < ActionMailer::Base
     @locale = comment.diary_entry.user.preferred_language_from(I18n.available_locales)
     @to_user = comment.diary_entry.user.display_name
     @from_user = comment.user.display_name
-    @body = comment.body
+    @text = comment.body
     @title = comment.diary_entry.title
     @readurl = url_for(:host => SERVER_URL,
                        :controller => "diary_entry",

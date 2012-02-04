@@ -41,7 +41,7 @@
     |
     <%= link_to t('user.view.edits'), :controller => 'changeset', :action => 'list', :display_name => @this_user.display_name %>
     |
-    <%= link_to t('user.view.traces'), :controller => 'trace', :action => 'view', :display_name => @this_user.display_name %>
+    <%= link_to t('user.view.traces'), :controller => 'trace', :action => 'list', :display_name => @this_user.display_name %>
     |
     <% if @user and @user.is_friends_with?(@this_user) %>
       <%= link_to t('user.view.remove as friend'), :controller => 'user', :action => 'remove_friend', :display_name => @this_user.display_name %>
@@ -78,12 +78,24 @@
 
 <p><b><%= t 'user.view.mapper since' %></b> <%= l @this_user.creation_time, :format => :friendly %> <%= t 'user.view.ago', :time_in_words_ago => time_ago_in_words(@this_user.creation_time) %></p>
 
-<% if @user and @user.administrator? %>
+<p><b><%= t 'user.view.ct status' %></b>
+<% if not @this_user.terms_agreed.nil? -%>
+<%= t 'user.view.ct accepted', :ago =>time_ago_in_words(@this_user.terms_agreed)  %> 
+<% elsif not @this_user.terms_seen? -%>
+<%= t 'user.view.ct undecided' %>
+<% else -%>
+<%= t 'user.view.ct declined' %>
+<% end -%>
+</p>
+
+<% if @user and @user.administrator? -%>
   <p><b><%= t 'user.view.email address' %></b> <%= @this_user.email %></p>  
+  <% unless @this_user.creation_ip.nil? -%>
   <p><b><%= t 'user.view.created from' %></b> <%= @this_user.creation_ip %></p>
+  <% end -%>
   <p><b><%= t 'user.view.status' %></b> <%= @this_user.status.capitalize %></p>
   <p><b><%= t 'user.view.spam score' %></b> <%= @this_user.spam_score %></p>
-<% end %>
+<% end -%>
 
 <h3><%= t 'user.view.description' %></h3>
 
@@ -106,6 +118,8 @@
   <% if friends.empty? %>
     <%= t 'user.view.no friends' %>
   <% else %>
+    <%= link_to t('user.view.friends_changesets'), {:controller => 'browse', :action => 'friends'} %><br/>
+    <%= link_to t('user.view.friends_diaries'), {:controller => 'diary', :action => 'friends'} %><br/><br/>
     <table id="friends">
       <%= render :partial => "contact", :collection => friends %>
     </table>
@@ -116,6 +130,8 @@
   <% if nearby.empty? %>
     <%= t 'user.view.no nearby users' %>
   <% else %>
+    <%= link_to t('user.view.nearby_changesets'), {:controller => 'browse', :action => 'nearby'} %><br/>
+    <%= link_to t('user.view.nearby_diaries'), {:controller => 'diary', :action => 'nearby'} %><br/><br/>
     <table id="nearbyusers">
       <%= render :partial => "contact", :collection => nearby %>
     </table>

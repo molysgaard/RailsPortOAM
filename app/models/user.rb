@@ -8,6 +8,7 @@ class User < ActiveRecord::Base
   has_many :new_messages, :class_name => "Message", :foreign_key => :to_user_id, :conditions => { :to_user_visible => true, :message_read => false }, :order => 'sent_on DESC'
   has_many :sent_messages, :class_name => "Message", :foreign_key => :from_user_id, :conditions => { :from_user_visible => true }, :order => 'sent_on DESC'
   has_many :friends, :include => :befriendee, :conditions => "users.status IN ('active', 'confirmed')"
+  has_many :friend_users, :through => :friends, :source => :befriendee
   has_many :tokens, :class_name => "UserToken"
   has_many :preferences, :class_name => "UserPreference"
   has_many :changesets, :order => 'created_at DESC'
@@ -20,12 +21,13 @@ class User < ActiveRecord::Base
 
   scope :visible, where(:status => ["pending", "active", "confirmed"])
   scope :active, where(:status => ["active", "confirmed"])
+  scope :public, where(:data_public => true)
 
   validates_presence_of :email, :display_name
   validates_confirmation_of :email#, :message => ' addresses must match'
   validates_confirmation_of :pass_crypt#, :message => ' must match the confirmation password'
-  validates_uniqueness_of :display_name, :allow_nil => true
-  validates_uniqueness_of :email
+  validates_uniqueness_of :display_name, :allow_nil => true, :case_sensitive => false, :if => Proc.new { |u| u.display_name_changed? }
+  validates_uniqueness_of :email, :case_sensitive => false, :if => Proc.new { |u| u.email_changed? }
   validates_uniqueness_of :openid_url, :allow_nil => true
   validates_length_of :pass_crypt, :within => 8..255
   validates_length_of :display_name, :within => 3..255, :allow_nil => true
@@ -47,9 +49,18 @@ class User < ActiveRecord::Base
   def self.authenticate(options)
     if options[:username] and options[:password]
       user = where("email = ? OR display_name = ?", options[:username], options[:username]).first
+
+      if user.nil?
+        users = where("LOWER(email) = LOWER(?) OR LOWER(display_name) = LOWER(?)", options[:username], options[:username])
+
+        if users.count == 1
+          user = users.first
+        end
+      end
+
       user = nil if user and user.pass_crypt != OSM::encrypt_password(options[:password], user.pass_salt)
     elsif options[:token]
-      token = UserToken.where(:token => options[:token]).preload(:user).first
+      token = UserToken.find_by_token(options[:token])
       user = token.user if token
     end
 

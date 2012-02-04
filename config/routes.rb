@@ -86,12 +86,14 @@ OpenStreetMap::Application.routes.draw do
   match '/browse/changeset/:id' => 'browse#changeset', :as => :changeset, :id => /\d+/
   match '/user/:display_name/edits' => 'changeset#list'
   match '/user/:display_name/edits/feed' => 'changeset#feed', :format => :atom
+  match '/browse/friends' => 'changeset#list', :friends => true
+  match '/browse/nearby' => 'changeset#list', :nearby => true
   match '/browse/changesets' => 'changeset#list'
   match '/browse/changesets/feed' => 'changeset#feed', :format => :atom
   match '/browse' => 'changeset#list'
 
   # web site
-  match '/' => 'site#index'
+  root :to => 'site#index'
   match '/edit' => 'site#edit'
   match '/copyright' => 'site#copyright'
   match '/copyright/:copyright_locale' => 'site#copyright'
@@ -153,6 +155,8 @@ OpenStreetMap::Application.routes.draw do
 
   # diary pages
   match '/diary/new' => 'diary_entry#new'
+  match '/diary/friends' => 'diary_entry#list', :friends => true
+  match '/diary/nearby' => 'diary_entry#list', :nearby => true  
   match '/user/:display_name/diary/rss' => 'diary_entry#rss', :format => :rss
   match '/diary/:language/rss' => 'diary_entry#rss', :format => :rss
   match '/diary/rss' => 'diary_entry#rss', :format => :rss
