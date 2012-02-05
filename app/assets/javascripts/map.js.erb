@@ -14,12 +14,12 @@ function onPopupClose(evt) {
 function buildTable(attrs) {
   head = '<table class="popuptable">';
   tail = "</table>";
-  cont = "<tr><td><center><b>FEATURE TAGS</b></center></td></tr>";
+  cont = '<tr><td colspan="2"><center><b>FEATURE TAGS</b></center></td></tr>';
   for (key in attrs['featureTags']) {
       cont = cont + "<tr><td>" + key.toString() + "</td><td>" + attrs['featureTags'][key].toString() + "</td></tr>";
   }
   if (attrs['relationTags'] != undefined) {
-      cont = cont + "<tr><td><center><b>RELATION TAGS</b></center></td></tr>";
+      cont = cont + '<tr><td colspan="2"><center><b>RELATION TAGS</b></center></td></tr>';
       for (key in attrs['relationTags']) {
           cont = cont + "<tr><td>" + key.toString() + "</td><td>" + attrs['relationTags'][key].toString() + "</td></tr>";
       }
