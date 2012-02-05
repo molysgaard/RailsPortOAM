@@ -14,37 +14,18 @@ function onPopupClose(evt) {
 function buildTable(attrs) {
   head = '<table class="popuptable">';
   tail = "</table>";
-  cont = "";
-  for (key in attrs) {
-    if (attrs[key] != null){
-      cont = cont + "<tr><td>" + key.toString() + "</td><td>" + attrs[key].toString() + "</td></tr>";
-    }
+  cont = "<tr><td><center><b>FEATURE TAGS</b></center></td></tr>";
+  for (key in attrs['featureTags']) {
+      cont = cont + "<tr><td>" + key.toString() + "</td><td>" + attrs['featureTags'][key].toString() + "</td></tr>";
+  }
+  if (attrs['relationTags'] != undefined) {
+      cont = cont + "<tr><td><center><b>RELATION TAGS</b></center></td></tr>";
+      for (key in attrs['relationTags']) {
+          cont = cont + "<tr><td>" + key.toString() + "</td><td>" + attrs['relationTags'][key].toString() + "</td></tr>";
+      }
   }
   return (head + cont + tail);
 }
-
-//function buildTable(attrs) {
-//  head = '<table class="popuptable">';
-//  tail = "</table>";
-//  cont = "";
-//  keyVals = attrs['tags'].slice(1,-1).split('", "');
-//  cont = cont + '<tr><td colspan="2"><center><b>FEATURE TAGS</b></center></td></tr>';
-//  for (var i=0; i<keyVals.length; i++) {
-//      var kv = keyVals[i].split('"=>"');
-//      cont = cont + "<tr><td>" + kv[0].toString() + "</td><td>" + kv[1].toString() + "</td></tr>";
-//  }
-//
-//  if (attrs['rel_tags']!="" && attrs['rel_tags'] != undefined) {
-//      cont = cont + '<tr><td colspan="2"><center><b>RELATION TAGS</b></center></td></tr>';
-//      keyVals = attrs['rel_tags'].slice(1,-1).split('", "');
-//      for (var i=0; i<keyVals.length; i++) {
-//          var kv = keyVals[i].split('"=>"');
-//          cont = cont + "<tr><td>" + kv[0].toString() + "</td><td>" + kv[1].toString() + "</td></tr>";
-//      }
-//  }
-//  return (head + cont + tail);
-//
-//}
 
 var OamFormatClass = OpenLayers.Class(OpenLayers.Format.GML, {
     read: function(data) {
@@ -54,19 +35,21 @@ var OamFormatClass = OpenLayers.Class(OpenLayers.Format.GML, {
         for (var j=0; j<features.length; j++) {
             //Add the relation tags first, this is because feature tags should overwrite relation tags.
             if (features[j].attributes['rel_tags'] != null){
+		features[j].attributes['relationTags'] = [];
                 keyVals = features[j].attributes['rel_tags'].slice(1,-1).split('", "');
                 for (var i=0; i<keyVals.length; i++) {
                     var kv = keyVals[i].split('"=>"');
-	            features[j].attributes[kv[0].toString()] = kv[1].toString();
+	            features[j].attributes['relationTags'][kv[0].toString()] = kv[1].toString();
                 }
 		delete features[j].attributes['rel_tags'];
             }
 
             if (features[j].attributes['tags'] != null){
+		features[j].attributes['featureTags'] = [];
                 keyVals = features[j].attributes['tags'].slice(1,-1).split('", "');
                 for (var i=0; i<keyVals.length; i++) {
                     var kv = keyVals[i].split('"=>"');
-	            features[j].attributes[kv[0].toString()] = kv[1].toString();
+	            features[j].attributes['featureTags'][kv[0].toString()] = kv[1].toString();
                 }
 		delete features[j].attributes['tags'];
             }
@@ -128,22 +111,22 @@ function createMap(divName, options) {
 
     var areaContext = {
         getFillColor: function(feature) {
-            if (feature.attributes["airspace"] == "yes"){
+            if (feature.attributes['featureTags']["airspace"] == "yes"){
               return "blue";
             }
         },
         getFillOpacity: function(feature) {
-            if (feature.attributes["airspace"] == "yes"){
+            if (feature.attributes['featureTags']["airspace"] == "yes"){
               return "0.2";
             }
         },
         getStrokeColor: function(feature) {
-            if (feature.attributes["airspace"] == "yes"){
+            if (feature.attributes['featureTags']["airspace"] == "yes"){
               return "blue"
             }
         },
         getStrokeOpacity: function(feature) {
-            if (feature.attributes["airspace"] == "yes"){
+            if (feature.attributes['featureTags']["airspace"] == "yes"){
               return "0.2";
             }
         },
@@ -157,36 +140,36 @@ function createMap(divName, options) {
     var pointContext = {
         getGraphic: function(feature) {
             //Start of navaid
-            if (feature.attributes["navaid"] == "yes"){
-              if (feature.attributes["navaid:vor"] != null){
-                if (feature.attributes["navaid:dme"] != null){
+            if (feature.attributes['featureTags']["navaid"] == "yes"){
+              if (feature.attributes['featureTags']["navaid:vor"] != null){
+                if (feature.attributes['featureTags']["navaid:dme"] != null){
                   return "/icons/renders/32/vor_dme.png";
                 }
-        	if (feature.attributes["navaid:tacan"] != null){
+        	if (feature.attributes['featureTags']["navaid:tacan"] != null){
                   return "/icons/renders/32/vor_tacan.png";
                 }
         	else {
                   return "/icons/renders/32/vor.png";
                 }
               }
-              if (feature.attributes["navaid:ndb"] != null){
+              if (feature.attributes['featureTags']["navaid:ndb"] != null){
                 return "/icons/renders/32/ndb.png";
               }
-              if (feature.attributes["navaid:dme"] != null){
+              if (feature.attributes['featureTags']["navaid:dme"] != null){
                 return "/icons/renders/32/dme.png";
               }
-              if (feature.attributes["navaid:tacan"] != null){
+              if (feature.attributes['featureTags']["navaid:tacan"] != null){
                 return "/icons/renders/32/tacan.png";
               }
               return "/icons/renders/32/navaid.png";
             }//Start of aerodrome
-            if (feature.attributes["aerodrome"] == "yes"){
+            if (feature.attributes['featureTags']["aerodrome"] == "yes"){
               return "/icons/renders/32/aerodrome.png";
             }//Start of obstacle
-            if (feature.attributes["obstacle"] == "yes"){
+            if (feature.attributes['featureTags']["obstacle"] == "yes"){
               return "/icons/renders/32/obstacle.png";
             }//Start of reporting points
-            if (feature.attributes["vfrreportingpoint"] == "yes"){
+            if (feature.attributes['featureTags']["vfrreportingpoint"] == "yes"){
               return "/icons/renders/32/vfrreportingpoint.png";
             }//Start of node catch all
             else {
