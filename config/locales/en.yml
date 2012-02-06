@@ -402,7 +402,7 @@ en:
       osmarender_image: "Osmarender Image"
       embeddable_html: "Embeddable HTML"
       licence: "Licence"
-      export_details: 'OpenAviationMap data is licensed under the <a href="http://creativecommons.org/licenses/by-sa/2.0/">Creative Commons Attribution-ShareAlike 2.0 license</a>.'
+      export_details: 'OpenAviationMap data is licensed under the <a href="http://opendatacommons.org/licenses/odbl/">Open Data Commons Open Database License (ODbL)</a>.'
       too_large:
         heading: "Area Too Large"
         body: "This area is too large to be exported as OpenAviationMap XML Data. Please zoom in or select a smaller area."
@@ -963,8 +963,8 @@ en:
     #foundation_title: The OpenAviationMap Foundation
     #sotm2011: 'Come to the 2011 OpenAviationMap Conference, The State of the Map, September 9-11th in Denver!'
     license:
-      alt: CC by-sa 2.0
-      title: OpenAviationMap data is licensed under the Creative Commons Attribution-Share Alike 2.0 Generic License
+      alt: (ODbL)
+      title: OpenAviationMap data is licensed under the Open Data Commons Open Database License (ODbL).
     #make_a_donation:
     #  title: Support OpenAviationMap with a monetary donation
     #  text: Make a Donation
@@ -982,38 +982,30 @@ en:
     legal_babble: |
       <h2>Copyright and License</h2>
       <p>
-         OpenAviationMap is <i>open data</i>, licensed under the <a
-         href="http://creativecommons.org/licenses/by-sa/2.0/">Creative
-         Commons Attribution-ShareAlike 2.0</a> licence (CC-BY-SA).
+         OpenAviationMap is <i>open data</i>, licensed under the <a href="http://opendatacommons.org/licenses/odbl/1.0/">Open Database License</a>. Any rights in individual contents of the database are licensed under the <a href="http://opendatacommons.org/licenses/dbcl/1.0/">Database Contents License</a>.
       </p>
       <p>
         You are free to copy, distribute, transmit and adapt our maps
         and data, as long as you credit OpenAviationMap and its
         contributors. If you alter or build upon our maps or data, you
-        may distribute the result only under the same licence. The
-        full <a
-        href="http://creativecommons.org/licenses/by-sa/2.0/legalcode">legal
-        code</a> explains your rights and responsibilities.
+        may distribute the result only under the same licence.
       </p>
 
       <h3>How to credit OpenAviationMap</h3>
       <p>
         If you are using OpenAviationMap map images, we request that
         your credit reads at least &ldquo;&copy; OpenAviationMap
-        contributors, CC-BY-SA&rdquo;. If you are using map data only,
+        contributors, ODbL&rdquo;. If you are using map data only,
         we request &ldquo;Map data &copy; OpenAviationMap contributors,
-        CC-BY-SA&rdquo;.
+        ODbL&rdquo;.
       </p>
       <p>
         Where possible, OpenAviationMap should be hyperlinked to <a
-        href="http://www.openaviationmap.org/">http://www.openaviationmap.org/</a>
-        and CC-BY-SA to <a
-        href="http://creativecommons.org/licenses/by-sa/2.0/">http://creativecommons.org/licenses/by-sa/2.0/</a>. If
-        you are using a medium where links are not possible (e.g. a
+        href="http://www.openaviationmap.org/">http://www.openaviationmap.org/</a>.
+        If you are using a medium where links are not possible (e.g. a
         printed work), we suggest you direct your readers to
         www.openaviationmap.org (perhaps by expanding
-        &lsquo;OpenAviationMap&rsquo; to this full address) and to
-        www.creativecommons.org.
+        &lsquo;OpenAviationMap&rsquo; to this full address.)
       </p>
 
       <h3>Finding out more</h3>
@@ -1023,7 +1015,7 @@ en:
         FAQ</a>.
       </p>
       <p>
-        OSM contributors are reminded never to add data from any
+        OAM contributors are reminded never to add data from any
         copyrighted sources (e.g. Google Maps or printed maps) without
         explicit permission from the copyright holders.
       </p>
@@ -1038,9 +1030,9 @@ en:
 
       <h3>Our contributors</h3>
       <p>
-        Our CC-BY-SA licence requires you to &ldquo;give the Original
+        Our ODbL licence requires you to &ldquo;give the Original
         Author credit reasonable to the medium or means You are
-        utilising&rdquo;. Individual OSM mappers do not request a
+        utilising&rdquo;. Individual OAM mappers do not request a
         credit over and above that to &ldquo;OpenAviationMap
         contributors&rdquo;, but where data from a national mapping
         agency or other major source has been included in
@@ -1057,11 +1049,11 @@ en:
       attribution is required to comply with the licence of the imported
       data.
 
-      Any additions here must be discussed with OSM sysadmins first.
+      Any additions here must be discussed with OAM sysadmins first.
       -->
 
       <ul id="contributors">
-          <li><strong>Australia</strong>: Contains suburb data based
+          <!-- <li><strong>Australia</strong>: Contains suburb data based
           on Australian Bureau of Statistics data.</li>
           <li><strong>Austria</strong>: Contains data from
           <a href="http://data.wien.gv.at/">Stadt Wien</a> under
@@ -1080,7 +1072,7 @@ en:
           UMP-pcPL contributors.</li>
           <li><strong>United Kingdom</strong>: Contains Ordnance
           Survey data &copy; Crown copyright and database right
-          2010.</li>
+          2010.</li> -->
       </ul>
 
       <p>
@@ -1260,8 +1252,8 @@ en:
       shortlink: Shortlink
       license:
         notice: "Licensed under the %{license_name} license by the %{project_name} and its contributors."
-        license_name: "Creative Commons Attribution-Share Alike 2.0"
-        license_url: "http://creativecommons.org/licenses/by-sa/2.0/"
+        license_name: "Open Data Commons Open Database License (ODbL)"
+        license_url: "http://opendatacommons.org/licenses/odbl/"
         project_name: "OpenAviationMap project"
         project_url: "http://openaviationmap.org"
       remote_failed: "Editing failed - make sure JOSM or Merkaartor is loaded and the remote control option is enabled"
