@@ -8,77 +8,6 @@ var popup;
 var selectControl;
 var gphy;
 
-// START FUNCTIONS FOR THE INFO POPUPS
-function onPopupClose(evt) {
-    selectControl.unselect(selectedFeature);
-}
-function buildTable(attrs) {
-  head = '<table class="popuptable">';
-  tail = "</table>";
-  cont = '<tr><td colspan="2"><center><b>FEATURE TAGS</b></center></td></tr>';
-  for (key in attrs['featureTags']) {
-      cont = cont + "<tr><td>" + key.toString() + "</td><td>" + attrs['featureTags'][key].toString() + "</td></tr>";
-  }
-  if (attrs['relationTags'] != undefined) {
-      cont = cont + '<tr><td colspan="2"><center><b>RELATION TAGS</b></center></td></tr>';
-      for (key in attrs['relationTags']) {
-          cont = cont + "<tr><td>" + key.toString() + "</td><td>" + attrs['relationTags'][key].toString() + "</td></tr>";
-      }
-  }
-  return (head + cont + tail);
-}
-
-var OamFormatClass = OpenLayers.Class(OpenLayers.Format.GML, {
-    read: function(data) {
-        gmlParser = new OpenLayers.Format.GML();
-	features = gmlParser.read(data);
-        //Add feature tags
-        for (var j=0; j<features.length; j++) {
-            //Add the relation tags first, this is because feature tags should overwrite relation tags.
-            if (features[j].attributes['rel_tags'] != null){
-		features[j].attributes['relationTags'] = [];
-                keyVals = features[j].attributes['rel_tags'].slice(1,-1).split('", "');
-                for (var i=0; i<keyVals.length; i++) {
-                    var kv = keyVals[i].split('"=>"');
-	            features[j].attributes['relationTags'][kv[0].toString()] = kv[1].toString();
-                }
-		delete features[j].attributes['rel_tags'];
-            }
-
-            if (features[j].attributes['tags'] != null){
-		features[j].attributes['featureTags'] = [];
-                keyVals = features[j].attributes['tags'].slice(1,-1).split('", "');
-                for (var i=0; i<keyVals.length; i++) {
-                    var kv = keyVals[i].split('"=>"');
-	            features[j].attributes['featureTags'][kv[0].toString()] = kv[1].toString();
-                }
-		delete features[j].attributes['tags'];
-            }
-	}
-	return features;
-    }
-});
-
-function onFeatureSelect(feature) {
-    selectedFeature = feature;
-    popup = new OpenLayers.Popup.FramedCloud("chicken", 
-                             feature.geometry.getBounds().getCenterLonLat(),
-			     null,
-                             "<div style='font-size:.8em; width: 300px'>" + buildTable(feature.attributes) + "</div>",
-                             null, true, onPopupClose);
-    popup.maxSize = new OpenLayers.Size(600,400);
-    popup.autoSize = true;
-    feature.popup = popup;
-    map.addPopup(popup);
-}
-function onFeatureUnselect(feature) {
-    map.removePopup(feature.popup);
-    feature.popup.destroy();
-    feature.popup = null;
-}
-// END FUNCTIONS FOR THE INFO POPUPS
-
-
 function pointToLonLat(point){
   if (point==undefined){
     return undefined;
@@ -125,17 +54,17 @@ function createMap(divName, options) {
 
     //THIS IS THE NEW WMS TEST MAP
     var lys_wms = new OpenLayers.Layer.WMS( "OAM WMS", 
-                    "http://openaviationmap.org/cgi-bin/mapserv?map=../mapserv/wms_dev.map&",
-                    //'http://openaviationmap.org/cgi-bin/tilecache?',
+                    // FOR DEV "http://openaviationmap.org/cgi-bin/mapserv?map=../mapserv/wms_dev.map&",
+                    'http://openaviationmap.org/cgi-bin/tilecache/tilecache.cgi?',
 		    {layers: ['oam-area','oam-line','oam-point'], format: 'image/png', transparent: true}); 
     map.addLayer(lys_wms);
 
         // THIS IS THE NEW INFO THINGY
         info = new OpenLayers.Control.WMSGetFeatureInfo({
             title: 'Identify features by clicking',
-            url: 'http://openaviationmap.org/cgi-bin/mapserv?map=../mapserv/wms_dev.map&',
-            //url: 'http://openaviationmap.org/cgi-bin/mapserv?map=/mapserv/wms.map&',
-            //layerUrls: ['http://openaviationmap.org/cgi-bin/tilecache?'],
+            // FOR DEV url: 'http://openaviationmap.org/cgi-bin/mapserv?map=../mapserv/wms_dev.map&',
+            url: 'http://openaviationmap.org/cgi-bin/mapserv?map=/mapserv/wms.map&',
+            layerUrls: ['http://openaviationmap.org/cgi-bin/tilecache/tilecache.cgi?'],
             queryVisible: true,
             eventListeners: {
                 getfeatureinfo: function(event) {
@@ -157,144 +86,9 @@ function createMap(divName, options) {
         map.addControl(info);
         info.activate();
 
-    //END OF THE NEW TEST MAP
-
-    //gphy = new OpenLayers.Layer.Google(
-    //    "Google Physical",
-    //    {type: google.maps.MapTypeId.TERRAIN, sphericalMercator: true, projection:"EPSG:900913"}
-    //);
-    //map.addLayer(gphy);
-
-    //var topo2 = new OpenLayers.Layer.WMS(
-    //    	"Topografisk norgeskart2","http://opencache.statkart.no/gatekeeper/gk/gk.open?",
-    //    	{layers: 'kartdata2', format: 'image/jpeg',
-    //    	projection: "EPSG:4326"});
-    //map.addLayer(topo2);
-
     var wms = new OpenLayers.Layer.WMS( "OpenLayers WMS", 
 	"http://vmap0.tiles.osgeo.org/wms/vmap0?", {layers: 'basic'}); 
     map.addLayer(wms);
-
-
-    ////START OF OAM STYLES
-    //var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
-    //renderer = (renderer) ? [renderer] : OpenLayers.Layer.Vector.prototype.renderers;
-
-    //var areaContext = {
-    //    getFillColor: function(feature) {
-    //        if (feature.attributes['featureTags']["airspace"] == "yes"){
-    //          return "blue";
-    //        }
-    //    },
-    //    getFillOpacity: function(feature) {
-    //        if (feature.attributes['featureTags']["airspace"] == "yes"){
-    //          return "0.2";
-    //        }
-    //    },
-    //    getStrokeColor: function(feature) {
-    //        if (feature.attributes['featureTags']["airspace"] == "yes"){
-    //          return "blue"
-    //        }
-    //    },
-    //    getStrokeOpacity: function(feature) {
-    //        if (feature.attributes['featureTags']["airspace"] == "yes"){
-    //          return "0.2";
-    //        }
-    //    },
-    //};
-    //var areaTemplate = {fillColor: "${getFillColor}",
-    //                strokeColor: "${getStrokeColor}",
-    //                fillOpacity: "${getFillOpacity}",
-    //                strokeOpacity: "${getStrokeOpacity}"};
-    //var areaStyle = new OpenLayers.Style(areaTemplate, {context:areaContext});
-
-    //var pointContext = {
-    //    getGraphic: function(feature) {
-    //        //Start of navaid
-    //        if (feature.attributes['featureTags']["navaid"] == "yes"){
-    //          if (feature.attributes['featureTags']["navaid:vor"] != null){
-    //            if (feature.attributes['featureTags']["navaid:dme"] != null){
-    //              return "/icons/renders/32/vor_dme.png";
-    //            }
-    //    	if (feature.attributes['featureTags']["navaid:tacan"] != null){
-    //              return "/icons/renders/32/vor_tacan.png";
-    //            }
-    //    	else {
-    //              return "/icons/renders/32/vor.png";
-    //            }
-    //          }
-    //          if (feature.attributes['featureTags']["navaid:ndb"] != null){
-    //            return "/icons/renders/32/ndb.png";
-    //          }
-    //          if (feature.attributes['featureTags']["navaid:dme"] != null){
-    //            return "/icons/renders/32/dme.png";
-    //          }
-    //          if (feature.attributes['featureTags']["navaid:tacan"] != null){
-    //            return "/icons/renders/32/tacan.png";
-    //          }
-    //          return "/icons/renders/32/navaid.png";
-    //        }//Start of aerodrome
-    //        if (feature.attributes['featureTags']["aerodrome"] == "yes"){
-    //          return "/icons/renders/32/aerodrome.png";
-    //        }//Start of obstacle
-    //        if (feature.attributes['featureTags']["obstacle"] == "yes"){
-    //          return "/icons/renders/32/obstacle.png";
-    //        }//Start of reporting points
-    //        if (feature.attributes['featureTags']["vfrreportingpoint"] == "yes"){
-    //          return "/icons/renders/32/vfrreportingpoint.png";
-    //        }//Start of node catch all
-    //        else {
-    //          return "/icons/renders/32/node.png";
-    //        }
-    //    },
-    //};
-    //var pointTemplate = {pointRadius:16, externalGraphic: "${getGraphic}"};
-
-    //var pointStyle = new OpenLayers.Style(pointTemplate, {context:pointContext});
-    ////END OAM STYLES
-
-    ////MAPSERVER WFS TEST
-    //mapserverArea = new OpenLayers.Layer.Vector("mapserver area test", {
-    //    strategies: [new OpenLayers.Strategy.BBOX()],
-    //    protocol: new OpenLayers.Protocol.WFS({
-    //        url: "http://openaviationmap.org/cgi-bin/mapserv?map=../test.map",
-    //        featureType: "LysWfsArea",
-    //        version: "1.0.0",
-    //        srsName: "EPSG:4326",
-    //        geometryName: "the_geom",
-    //        readFormat: new OamFormatClass(),
-    //    }),
-    //    projection: "EPSG:4326",
-    //    styleMap: new OpenLayers.StyleMap(areaStyle),
-    //    renderers: renderer,
-    //});
-    //map.addLayer(mapserverArea);
-
-    //mapserverNode = new OpenLayers.Layer.Vector("mapserver node test", {
-    //    strategies: [new OpenLayers.Strategy.BBOX()],
-    //    protocol: new OpenLayers.Protocol.WFS({
-    //        url: "http://openaviationmap.org/cgi-bin/mapserv?map=../test.map",
-    //        featureType: "LysWfsNode",
-    //        version: "1.0.0",
-    //        srsName: "EPSG:4326",
-    //        geometryName: "the_geom",
-    //        readFormat: new OamFormatClass(),
-    //    }),
-    //    projection: "EPSG:4326",
-    //    styleMap: new OpenLayers.StyleMap(pointStyle),
-    //    renderers: renderer,
-    //});
-    //map.addLayer(mapserverNode);
-
-    //START OF SELECT FEATURE THINGY
-    //selectControl = new OpenLayers.Control.SelectFeature([mapserverNode,mapserverArea],
-    //        {onSelect: onFeatureSelect, onUnselect: onFeatureUnselect});
-
-    //var panel = new OpenLayers.Control.Panel({defaultControl: selectControl});
-    //panel.addControls([selectControl]);
-    //map.addControl(panel);
-
-    //END OF SELECT FEATURE THINGY
 
     map.addControl(new OpenLayers.Control.LayerSwitcher());
     map.addControl(new OpenLayers.Control.MousePosition());
