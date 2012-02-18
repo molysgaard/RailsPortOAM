@@ -6,6 +6,7 @@ var mapserverNode;
 var mapserverArea;
 var popup;
 var selectControl;
+var gphy;
 
 // START FUNCTIONS FOR THE INFO POPUPS
 function onPopupClose(evt) {
@@ -86,142 +87,212 @@ function pointToLonLat(point){
   return lonlat;
 }
 
+function escapeHTML(str)
+{
+  var div = document.createElement('div');
+  div.innerHTML = str;
+  return div.firstChild.nodeValue;
+}
+
+function buildView(obj){
+  pre = "<table>";
+  post = "</table>";
+  text = "";
+  for (var j=0; j+2<obj.length; j += 2){
+    //object tags
+	  text = text + '<tr><td colspan="2"><b><center>Object ' + (j/2) + '</center></b></td></tr>';
+	  text = text + '<tr><td colspan="2"><b><center>Feature tags:</center></b></td></tr>';
+    keyVals = obj[j].slice(1,-1).split('", "');
+    for (var i=0; i<keyVals.length; i++) {
+      var kv = keyVals[i].split('"=>"');
+      text = text + "<tr><td>" + kv[0] + "</td><td>" + kv[1] + "</td></tr>";
+    }
+    //relations
+    text = text + '<tr><td colspan="2"><b><center>Relation tags:</b></center></td></tr>';
+    keyVals = obj[j+1].slice(1,-1).split('", "');
+    for (var i=0; i<keyVals.length; i++) {
+      var kv = keyVals[i].split('"=>"');
+      text = text + "<tr><td>" + kv[0] + "</td><td>" + kv[1] + "</td></tr>";
+    }
+    text = text + '<tr><td colspan="2"></td></tr>';
+  }
+  return pre + text + post;
+}
+
 function createMap(divName, options) {
     OpenLayers.ProxyHost = "/cgi-bin/proxy.cgi?url=";
     map = new OpenLayers.Map('map');
-    var gphy = new OpenLayers.Layer.Google(
-        "Google Physical",
-        {type: google.maps.MapTypeId.TERRAIN}
-    );
-    map.addLayer(gphy);
 
-    var topo2 = new OpenLayers.Layer.WMS(
-		"Topografisk norgeskart2","http://opencache.statkart.no/gatekeeper/gk/gk.open?",
-		{layers: 'kartdata2', format: 'image/jpeg',
-		projection: "EPSG:4326"});
-    map.addLayer(topo2);
+    //THIS IS THE NEW WMS TEST MAP
+    var lys_wms = new OpenLayers.Layer.WMS( "OAM WMS", 
+                    "http://openaviationmap.org/cgi-bin/mapserv?map=../mapserv/wms_dev.map&",
+                    //'http://openaviationmap.org/cgi-bin/tilecache?',
+		    {layers: ['oam-area','oam-line','oam-point'], format: 'image/png', transparent: true}); 
+    map.addLayer(lys_wms);
+
+        // THIS IS THE NEW INFO THINGY
+        info = new OpenLayers.Control.WMSGetFeatureInfo({
+            title: 'Identify features by clicking',
+            url: 'http://openaviationmap.org/cgi-bin/mapserv?map=../mapserv/wms_dev.map&',
+            //url: 'http://openaviationmap.org/cgi-bin/mapserv?map=/mapserv/wms.map&',
+            //layerUrls: ['http://openaviationmap.org/cgi-bin/tilecache?'],
+            queryVisible: true,
+            eventListeners: {
+                getfeatureinfo: function(event) {
+                    var resp = buildView(escapeHTML(event.text).split("\n"));
+                    var pop = new OpenLayers.Popup.FramedCloud(
+                        "chicken", 
+                        map.getLonLatFromPixel(event.xy),
+                        null,
+                        resp,
+                        null,
+                        true
+                    );
+                    pop.maxSize = new OpenLayers.Size(600,400);
+                    pop.autoSize = true;
+                    map.addPopup(pop);
+                }
+            }
+        });
+        map.addControl(info);
+        info.activate();
+
+    //END OF THE NEW TEST MAP
+
+    //gphy = new OpenLayers.Layer.Google(
+    //    "Google Physical",
+    //    {type: google.maps.MapTypeId.TERRAIN, sphericalMercator: true, projection:"EPSG:900913"}
+    //);
+    //map.addLayer(gphy);
+
+    //var topo2 = new OpenLayers.Layer.WMS(
+    //    	"Topografisk norgeskart2","http://opencache.statkart.no/gatekeeper/gk/gk.open?",
+    //    	{layers: 'kartdata2', format: 'image/jpeg',
+    //    	projection: "EPSG:4326"});
+    //map.addLayer(topo2);
 
     var wms = new OpenLayers.Layer.WMS( "OpenLayers WMS", 
 	"http://vmap0.tiles.osgeo.org/wms/vmap0?", {layers: 'basic'}); 
     map.addLayer(wms);
 
-    //START OF OAM STYLES
-    var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
-    renderer = (renderer) ? [renderer] : OpenLayers.Layer.Vector.prototype.renderers;
 
-    var areaContext = {
-        getFillColor: function(feature) {
-            if (feature.attributes['featureTags']["airspace"] == "yes"){
-              return "blue";
-            }
-        },
-        getFillOpacity: function(feature) {
-            if (feature.attributes['featureTags']["airspace"] == "yes"){
-              return "0.2";
-            }
-        },
-        getStrokeColor: function(feature) {
-            if (feature.attributes['featureTags']["airspace"] == "yes"){
-              return "blue"
-            }
-        },
-        getStrokeOpacity: function(feature) {
-            if (feature.attributes['featureTags']["airspace"] == "yes"){
-              return "0.2";
-            }
-        },
-    };
-    var areaTemplate = {fillColor: "${getFillColor}",
-                    strokeColor: "${getStrokeColor}",
-                    fillOpacity: "${getFillOpacity}",
-                    strokeOpacity: "${getStrokeOpacity}"};
-    var areaStyle = new OpenLayers.Style(areaTemplate, {context:areaContext});
+    ////START OF OAM STYLES
+    //var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
+    //renderer = (renderer) ? [renderer] : OpenLayers.Layer.Vector.prototype.renderers;
 
-    var pointContext = {
-        getGraphic: function(feature) {
-            //Start of navaid
-            if (feature.attributes['featureTags']["navaid"] == "yes"){
-              if (feature.attributes['featureTags']["navaid:vor"] != null){
-                if (feature.attributes['featureTags']["navaid:dme"] != null){
-                  return "/icons/renders/32/vor_dme.png";
-                }
-        	if (feature.attributes['featureTags']["navaid:tacan"] != null){
-                  return "/icons/renders/32/vor_tacan.png";
-                }
-        	else {
-                  return "/icons/renders/32/vor.png";
-                }
-              }
-              if (feature.attributes['featureTags']["navaid:ndb"] != null){
-                return "/icons/renders/32/ndb.png";
-              }
-              if (feature.attributes['featureTags']["navaid:dme"] != null){
-                return "/icons/renders/32/dme.png";
-              }
-              if (feature.attributes['featureTags']["navaid:tacan"] != null){
-                return "/icons/renders/32/tacan.png";
-              }
-              return "/icons/renders/32/navaid.png";
-            }//Start of aerodrome
-            if (feature.attributes['featureTags']["aerodrome"] == "yes"){
-              return "/icons/renders/32/aerodrome.png";
-            }//Start of obstacle
-            if (feature.attributes['featureTags']["obstacle"] == "yes"){
-              return "/icons/renders/32/obstacle.png";
-            }//Start of reporting points
-            if (feature.attributes['featureTags']["vfrreportingpoint"] == "yes"){
-              return "/icons/renders/32/vfrreportingpoint.png";
-            }//Start of node catch all
-            else {
-              return "/icons/renders/32/node.png";
-            }
-        },
-    };
-    var pointTemplate = {pointRadius:16, externalGraphic: "${getGraphic}"};
+    //var areaContext = {
+    //    getFillColor: function(feature) {
+    //        if (feature.attributes['featureTags']["airspace"] == "yes"){
+    //          return "blue";
+    //        }
+    //    },
+    //    getFillOpacity: function(feature) {
+    //        if (feature.attributes['featureTags']["airspace"] == "yes"){
+    //          return "0.2";
+    //        }
+    //    },
+    //    getStrokeColor: function(feature) {
+    //        if (feature.attributes['featureTags']["airspace"] == "yes"){
+    //          return "blue"
+    //        }
+    //    },
+    //    getStrokeOpacity: function(feature) {
+    //        if (feature.attributes['featureTags']["airspace"] == "yes"){
+    //          return "0.2";
+    //        }
+    //    },
+    //};
+    //var areaTemplate = {fillColor: "${getFillColor}",
+    //                strokeColor: "${getStrokeColor}",
+    //                fillOpacity: "${getFillOpacity}",
+    //                strokeOpacity: "${getStrokeOpacity}"};
+    //var areaStyle = new OpenLayers.Style(areaTemplate, {context:areaContext});
 
-    var pointStyle = new OpenLayers.Style(pointTemplate, {context:pointContext});
-    //END OAM STYLES
+    //var pointContext = {
+    //    getGraphic: function(feature) {
+    //        //Start of navaid
+    //        if (feature.attributes['featureTags']["navaid"] == "yes"){
+    //          if (feature.attributes['featureTags']["navaid:vor"] != null){
+    //            if (feature.attributes['featureTags']["navaid:dme"] != null){
+    //              return "/icons/renders/32/vor_dme.png";
+    //            }
+    //    	if (feature.attributes['featureTags']["navaid:tacan"] != null){
+    //              return "/icons/renders/32/vor_tacan.png";
+    //            }
+    //    	else {
+    //              return "/icons/renders/32/vor.png";
+    //            }
+    //          }
+    //          if (feature.attributes['featureTags']["navaid:ndb"] != null){
+    //            return "/icons/renders/32/ndb.png";
+    //          }
+    //          if (feature.attributes['featureTags']["navaid:dme"] != null){
+    //            return "/icons/renders/32/dme.png";
+    //          }
+    //          if (feature.attributes['featureTags']["navaid:tacan"] != null){
+    //            return "/icons/renders/32/tacan.png";
+    //          }
+    //          return "/icons/renders/32/navaid.png";
+    //        }//Start of aerodrome
+    //        if (feature.attributes['featureTags']["aerodrome"] == "yes"){
+    //          return "/icons/renders/32/aerodrome.png";
+    //        }//Start of obstacle
+    //        if (feature.attributes['featureTags']["obstacle"] == "yes"){
+    //          return "/icons/renders/32/obstacle.png";
+    //        }//Start of reporting points
+    //        if (feature.attributes['featureTags']["vfrreportingpoint"] == "yes"){
+    //          return "/icons/renders/32/vfrreportingpoint.png";
+    //        }//Start of node catch all
+    //        else {
+    //          return "/icons/renders/32/node.png";
+    //        }
+    //    },
+    //};
+    //var pointTemplate = {pointRadius:16, externalGraphic: "${getGraphic}"};
 
-    //MAPSERVER WFS TEST
-    mapserverArea = new OpenLayers.Layer.Vector("mapserver area test", {
-        strategies: [new OpenLayers.Strategy.BBOX()],
-        protocol: new OpenLayers.Protocol.WFS({
-            url: "http://openaviationmap.org/cgi-bin/mapserv?map=../test.map",
-            featureType: "LysWfsArea",
-            version: "1.0.0",
-            srsName: "EPSG:4326",
-            geometryName: "the_geom",
-            readFormat: new OamFormatClass(),
-        }),
-        projection: "EPSG:4326",
-        styleMap: new OpenLayers.StyleMap(areaStyle),
-        renderers: renderer,
-    });
-    map.addLayer(mapserverArea);
+    //var pointStyle = new OpenLayers.Style(pointTemplate, {context:pointContext});
+    ////END OAM STYLES
 
-    mapserverNode = new OpenLayers.Layer.Vector("mapserver node test", {
-        strategies: [new OpenLayers.Strategy.BBOX()],
-        protocol: new OpenLayers.Protocol.WFS({
-            url: "http://openaviationmap.org/cgi-bin/mapserv?map=../test.map",
-            featureType: "LysWfsNode",
-            version: "1.0.0",
-            srsName: "EPSG:4326",
-            geometryName: "the_geom",
-            readFormat: new OamFormatClass(),
-        }),
-        projection: "EPSG:4326",
-        styleMap: new OpenLayers.StyleMap(pointStyle),
-        renderers: renderer,
-    });
-    map.addLayer(mapserverNode);
+    ////MAPSERVER WFS TEST
+    //mapserverArea = new OpenLayers.Layer.Vector("mapserver area test", {
+    //    strategies: [new OpenLayers.Strategy.BBOX()],
+    //    protocol: new OpenLayers.Protocol.WFS({
+    //        url: "http://openaviationmap.org/cgi-bin/mapserv?map=../test.map",
+    //        featureType: "LysWfsArea",
+    //        version: "1.0.0",
+    //        srsName: "EPSG:4326",
+    //        geometryName: "the_geom",
+    //        readFormat: new OamFormatClass(),
+    //    }),
+    //    projection: "EPSG:4326",
+    //    styleMap: new OpenLayers.StyleMap(areaStyle),
+    //    renderers: renderer,
+    //});
+    //map.addLayer(mapserverArea);
+
+    //mapserverNode = new OpenLayers.Layer.Vector("mapserver node test", {
+    //    strategies: [new OpenLayers.Strategy.BBOX()],
+    //    protocol: new OpenLayers.Protocol.WFS({
+    //        url: "http://openaviationmap.org/cgi-bin/mapserv?map=../test.map",
+    //        featureType: "LysWfsNode",
+    //        version: "1.0.0",
+    //        srsName: "EPSG:4326",
+    //        geometryName: "the_geom",
+    //        readFormat: new OamFormatClass(),
+    //    }),
+    //    projection: "EPSG:4326",
+    //    styleMap: new OpenLayers.StyleMap(pointStyle),
+    //    renderers: renderer,
+    //});
+    //map.addLayer(mapserverNode);
 
     //START OF SELECT FEATURE THINGY
-    selectControl = new OpenLayers.Control.SelectFeature([mapserverNode,mapserverArea],
-            {onSelect: onFeatureSelect, onUnselect: onFeatureUnselect});
+    //selectControl = new OpenLayers.Control.SelectFeature([mapserverNode,mapserverArea],
+    //        {onSelect: onFeatureSelect, onUnselect: onFeatureUnselect});
 
-    var panel = new OpenLayers.Control.Panel({defaultControl: selectControl});
-    panel.addControls([selectControl]);
-    map.addControl(panel);
+    //var panel = new OpenLayers.Control.Panel({defaultControl: selectControl});
+    //panel.addControls([selectControl]);
+    //map.addControl(panel);
 
     //END OF SELECT FEATURE THINGY
 
