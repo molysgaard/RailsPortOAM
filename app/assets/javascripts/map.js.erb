@@ -86,6 +86,14 @@ function createMap(divName, options) {
         map.addControl(info);
         info.activate();
 
+    var wms = new OpenLayers.Layer.WMS( "Europe, (Norwegian char authority)",
+	"http://opencache.statkart.no/gatekeeper/gk/gk.open?", {layers: 'europa'}); 
+    map.addLayer(wms);
+
+    var wms = new OpenLayers.Layer.WMS( "Norway-topo, (Norwegian char authority)",
+        "http://opencache.statkart.no/gatekeeper/gk/gk.open?", {layers: 'topo2'}); 
+    map.addLayer(wms);
+
     var wms = new OpenLayers.Layer.WMS( "OpenLayers WMS", 
 	"http://vmap0.tiles.osgeo.org/wms/vmap0?", {layers: 'basic'}); 
     map.addLayer(wms);
