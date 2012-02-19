@@ -1,12 +1,7 @@
 var epsg4326 = new OpenLayers.Projection("EPSG:4326");
 var map;
 var markers;
-var mapserverNode;
-//var mapserverLine;
-var mapserverArea;
 var popup;
-var selectControl;
-var gphy;
 
 function pointToLonLat(point){
   if (point==undefined){
@@ -54,7 +49,7 @@ function createMap(divName, options) {
 
     //THIS IS THE NEW WMS TEST MAP
     var lys_wms = new OpenLayers.Layer.WMS( "OAM WMS", 
-                    // FOR DEV "http://openaviationmap.org/cgi-bin/mapserv?map=../mapserv/wms_dev.map&",
+                    //"http://openaviationmap.org/cgi-bin/mapserv?map=../mapserv/wms_dev.map&",
                     'http://openaviationmap.org/cgi-bin/tilecache/tilecache.cgi?',
 		    {layers: ['oam-area','oam-line','oam-point'], format: 'image/png', transparent: true}); 
     map.addLayer(lys_wms);
@@ -62,7 +57,7 @@ function createMap(divName, options) {
         // THIS IS THE NEW INFO THINGY
         info = new OpenLayers.Control.WMSGetFeatureInfo({
             title: 'Identify features by clicking',
-            // FOR DEV url: 'http://openaviationmap.org/cgi-bin/mapserv?map=../mapserv/wms_dev.map&',
+            //url: 'http://openaviationmap.org/cgi-bin/mapserv?map=../mapserv/wms_dev.map&',
             url: 'http://openaviationmap.org/cgi-bin/mapserv?map=../mapserv/wms.map&',
             layerUrls: ['http://openaviationmap.org/cgi-bin/tilecache/tilecache.cgi?'],
             queryVisible: true,
@@ -86,11 +81,11 @@ function createMap(divName, options) {
         map.addControl(info);
         info.activate();
 
-    var wms = new OpenLayers.Layer.WMS( "Europe, (Norwegian char authority)",
+    var wms = new OpenLayers.Layer.WMS( "Europe, (Norwegian chart authority)",
 	"http://opencache.statkart.no/gatekeeper/gk/gk.open?", {layers: 'europa'}); 
     map.addLayer(wms);
 
-    var wms = new OpenLayers.Layer.WMS( "Norway-topo, (Norwegian char authority)",
+    var wms = new OpenLayers.Layer.WMS( "Norway-topo, (Norwegian chart authority)",
         "http://opencache.statkart.no/gatekeeper/gk/gk.open?", {layers: 'topo2'}); 
     map.addLayer(wms);
 
