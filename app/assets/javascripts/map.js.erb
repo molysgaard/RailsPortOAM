@@ -1,4 +1,5 @@
 var epsg4326 = new OpenLayers.Projection("EPSG:4326");
+//var epsg4326 = new OpenLayers.Projection("EPSG:900913");
 var map;
 var markers;
 var popup;
@@ -46,6 +47,7 @@ function buildView(obj){
 function createMap(divName, options) {
     OpenLayers.ProxyHost = "/cgi-bin/proxy.cgi?url=";
     map = new OpenLayers.Map('map');
+    map.projection = epsg4326;
 
     //THIS IS THE NEW WMS TEST MAP
     var lys_wms = new OpenLayers.Layer.WMS( "OAM WMS", 
@@ -81,17 +83,54 @@ function createMap(divName, options) {
         map.addControl(info);
         info.activate();
 
-    var wms = new OpenLayers.Layer.WMS( "Europe, (Norwegian chart authority)",
+    //var mapnik = new OpenLayers.Layer.OSM("Mapnik", ["http://tile.openstreetmap.org/${z}/${x}/${y}.png"]);
+    //map.addLayer(mapnik);
+
+    var norEur = new OpenLayers.Layer.WMS( "Europe, (Norwegian chart authority)",
 	"http://opencache.statkart.no/gatekeeper/gk/gk.open?", {layers: 'europa'}); 
-    map.addLayer(wms);
+    map.addLayer(norEur);
 
-    var wms = new OpenLayers.Layer.WMS( "Norway-topo, (Norwegian chart authority)",
+    var nor = new OpenLayers.Layer.WMS( "Norway-topo, (Norwegian chart authority)",
         "http://opencache.statkart.no/gatekeeper/gk/gk.open?", {layers: 'topo2'}); 
-    map.addLayer(wms);
+    map.addLayer(nor);
 
-    var wms = new OpenLayers.Layer.WMS( "OpenLayers WMS", 
+    var vmap = new OpenLayers.Layer.WMS( "OpenLayers WMS", 
 	"http://vmap0.tiles.osgeo.org/wms/vmap0?", {layers: 'basic'}); 
-    map.addLayer(wms);
+    map.addLayer(vmap);
+
+
+    ////OPEN PISTE MAP SPECIFICS
+    ////THIS ADDS THE OPENPISEMAP HILLSHADING!!
+    //OpenLayers.Layer.OPM = OpenLayers.Class(OpenLayers.Layer.OSM, {
+    //	initialize: function(name, url, options, url_args) {
+    //		this.url_args = url_args;
+    //		var newArguments = [name, url, options];
+    //		OpenLayers.Layer.OSM.prototype.initialize.apply(this, newArguments);
+    //	},
+    //
+    //	getURL: function (bounds) {
+    //		var newArguments = [bounds];
+    //		if (this.url_args == undefined) url_args = "";
+    //		else url_args = this.url_args;
+    //		return OpenLayers.Layer.OSM.prototype.getURL.apply(this, newArguments) + url_args;
+    //	}
+    //});
+    //OpenLayers.Layer.OSM.opm_landshaded = OpenLayers.Class(OpenLayers.Layer.OPM, {
+    //    initialize: function(name, options, args) {
+    //        var url = [
+    //            "http://tiles2.openpistemap.org/landshaded/${z}/${x}/${y}.png"
+    //        ];
+    //        options = OpenLayers.Util.extend({ numZoomLevels: 19, isBaseLayer: false, transparent: true, opacity: 0.8, alpha: true }, options);
+    //        var newArguments = [name, url, options, args];
+    //        OpenLayers.Layer.OPM.prototype.initialize.apply(this, newArguments);
+    //    },
+    //
+    //    CLASS_NAME: "OpenLayers.Layer.OSM.opm_landshaded"
+    //});
+    //map.addLayer(new OpenLayers.Layer.OSM.opm_landshaded("Hill Shading", null, ""));
+    ////END OF OPEN PISTE MAP SPECIFICS
+
+
 
     map.addControl(new OpenLayers.Control.LayerSwitcher());
     map.addControl(new OpenLayers.Control.MousePosition());
